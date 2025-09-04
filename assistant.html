@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Assistant Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav>
+    <h2>Assistant Dashboard</h2>
+  </nav>
+  <div class="container">
+    <h3>Select Grade</h3>
+    <select id="gradeSelect">
+      <option>Grade 2</option>
+      <option>Grade 3</option>
+      <option>Grade 4</option>
+      <option>Grade 5</option>
+      <option>Grade 6</option>
+    </select>
+
+    <h3>Class Controls</h3>
+    <button onclick="cancelLesson()">Cancel Current Lesson</button>
+
+    <h3>Students</h3>
+    <div id="students"></div>
+  </div>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>
