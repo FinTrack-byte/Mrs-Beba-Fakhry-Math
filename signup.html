@@ -2,54 +2,45 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sign Up</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <header>
+    <img src="logo.png" alt="Center Logo">
+    <h2>Student Portal</h2>
+  </header>
+
   <div class="container">
-    <h2>Sign Up</h2>
-    <input type="text" id="name" placeholder="Full Name">
-    <select id="grade">
-      <option>Grade 2</option>
-      <option>Grade 3</option>
-      <option>Grade 4</option>
-      <option>Grade 5</option>
-      <option>Grade 6</option>
-    </select>
-    <input type="email" id="email" placeholder="Email">
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="signup()">Sign Up</button>
+    <h3>Create Account</h3>
+    <form id="signupForm">
+      <input type="text" id="signupName" placeholder="Full Name" required><br><br>
+      <input type="email" id="signupEmail" placeholder="Email" required><br><br>
+      <input type="password" id="signupPassword" placeholder="Password" required><br><br>
+
+      <label for="gradeSelect">Choose Your Group:</label><br>
+      <select id="gradeSelect" required>
+        <option value="">-- Select Group --</option>
+        <option value="grade3-sat-tue">Grade 3 (Sat & Tue 4:30 - 5:30 PM)</option>
+        <option value="grade2-sat-tue">Grade 2 (Sat & Tue 5:30 - 6:30 PM)</option>
+        <option value="grade4-sat-tue">Grade 4 (Sat & Tue 6:45 - 8:00 PM)</option>
+        <option value="grade6-sat-tue">Grade 6 (Sat & Tue 8:00 - 9:00 PM)</option>
+        <option value="grade3-sun-wed">Grade 3 (Sun & Wed 4:30 - 5:30 PM)</option>
+        <option value="grade4-sun-wed">Grade 4 (Sun & Wed 5:30 - 6:30 PM)</option>
+        <option value="grade2-sun-wed">Grade 2 (Sun & Wed 6:30 - 7:30 PM)</option>
+        <option value="grade5-sun-wed">Grade 5 (Sun & Wed 7:30 - 8:30 PM)</option>
+        <option value="grade6-sun-wed">Grade 6 (Sun & Wed 8:30 - 9:30 PM)</option>
+        <option value="grade5-mon-thu">Grade 5 (Mon & Thu 5:30 - 6:30 PM)</option>
+        <option value="grade4-mon-thu">Grade 4 (Mon & Thu 7:00 - 8:00 PM)</option>
+        <option value="grade6-mon-thu">Grade 6 (Mon & Thu 8:15 - 9:15 PM)</option>
+      </select><br><br>
+
+      <button type="submit">Sign Up</button>
+    </form>
     <p>Already have an account? <a href="index.html">Login</a></p>
   </div>
 
-  <script type="module">
-    import { auth, db } from "./firebase.js";
-    import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-    import { ref, set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
-
-    async function signup() {
-      const name = document.getElementById("name").value;
-      const grade = document.getElementById("grade").value;
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-
-      try {
-        const userCred = await createUserWithEmailAndPassword(auth, email, password);
-        const uid = userCred.user.uid;
-
-        await set(ref(db, "users/" + uid), {
-          name,
-          grade,
-          email
-        });
-
-        localStorage.setItem("uid", uid);
-        window.location.href = "student.html";
-      } catch (error) {
-        alert(error.message);
-      }
-    }
-    window.signup = signup;
-  </script>
+  <script src="app.js"></script>
 </body>
 </html>
