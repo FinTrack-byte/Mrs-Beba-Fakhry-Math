@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav>
+    <h2>Student Dashboard</h2>
+  </nav>
+  <div class="container">
+    <h3 id="welcome"></h3>
+    <h4>Next Lesson Countdown:</h4>
+    <p id="countdown"></p>
+
+    <h4>Homework</h4>
+    <div id="homework">No homework yet.</div>
+
+    <h4>Chat</h4>
+    <div id="chatBox" style="height:200px; overflow:auto; background:#fff; color:black;"></div>
+    <input type="text" id="chatInput" placeholder="Type message">
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>
