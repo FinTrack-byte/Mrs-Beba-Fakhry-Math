@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sign Up</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Sign Up</h2>
+    <input type="text" id="name" placeholder="Full Name">
+    <select id="grade">
+      <option>Grade 2</option>
+      <option>Grade 3</option>
+      <option>Grade 4</option>
+      <option>Grade 5</option>
+      <option>Grade 6</option>
+    </select>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="signup()">Sign Up</button>
+    <p>Already have an account? <a href="index.html">Login</a></p>
+  </div>
+
+  <script type="module">
+    import { auth, db } from "./firebase.js";
+    import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { ref, set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+    async function signup() {
+      const name = document.getElementById("name").value;
+      const grade = document.getElementById("grade").value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      try {
+        const userCred = await createUserWithEmailAndPassword(auth, email, password);
+        const uid = userCred.user.uid;
+
+        await set(ref(db, "users/" + uid), {
+          name,
+          grade,
+          email
+        });
+
+        localStorage.setItem("uid", uid);
+        window.location.href = "student.html";
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+    window.signup = signup;
+  </script>
+</body>
+</html>
