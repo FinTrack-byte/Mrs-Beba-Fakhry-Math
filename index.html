@@ -13,33 +13,34 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #0f0f0f 0%, #200d3d 100%);
-            color: #f3f4f6;
+            background-color: white;
+            color: black;
             min-height: 100vh;
         }
 
         .container-base {
-            background-color: #1a1a1a;
+            background-color: #f0f0f0;
             border-radius: 1rem;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
 
         .btn-primary {
-            background: linear-gradient(90deg, #6b21a8 0%, #a855f7 100%);
+            background-color: #a855f7;
             color: white;
             padding: 0.75rem 1.5rem;
             border-radius: 0.5rem;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
         .btn-primary:hover {
+            background-color: #9333ea;
             transform: translateY(-2px);
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
 
         .input-field {
-            background-color: #333;
-            color: #e2e8f0;
-            border: 1px solid #444;
+            background-color: white;
+            color: black;
+            border: 1px solid #ccc;
             border-radius: 0.5rem;
         }
         .input-field:focus {
@@ -55,15 +56,17 @@
         }
         .message-mine {
             background-color: #a855f7;
+            color: white;
             align-self: flex-end;
         }
         .message-other {
-            background-color: #4a1f6a;
+            background-color: #e5e7eb;
+            color: black;
             align-self: flex-start;
         }
         .message-user {
              font-size: 0.8rem;
-             color: #d1d5db;
+             color: #6b7280;
         }
         
         .tab-button {
@@ -83,7 +86,7 @@
             width: 8px;
         }
         .chat-messages::-webkit-scrollbar-track {
-            background: #1a1a1a;
+            background: #f0f0f0;
             border-radius: 10px;
         }
         .chat-messages::-webkit-scrollbar-thumb {
@@ -91,7 +94,7 @@
             border-radius: 10px;
         }
         .chat-messages::-webkit-scrollbar-thumb:hover {
-            background: #6b21a8;
+            background: #9333ea;
         }
     </style>
 </head>
@@ -117,8 +120,11 @@
     <div id="app-container" class="container-base w-full max-w-4xl p-6 lg:p-12 space-y-8 min-h-[90vh] flex flex-col justify-between">
         <!-- Header -->
         <header class="flex justify-between items-center mb-6">
-            <h1 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-white">Mrs. Beba Fakhry Math</h1>
-            <button id="logout-btn" class="text-white hover:text-red-400 hidden">Logout</button>
+            <div class="flex items-center space-x-4">
+                <span class="text-3xl font-bold">Logo</span>
+                <h1 class="text-3xl font-bold">Mrs. Beba Fakhry Math</h1>
+            </div>
+            <button id="logout-btn" class="text-black hover:text-red-600 hidden">Logout</button>
         </header>
 
         <!-- Main Content (Dynamic) -->
@@ -127,21 +133,23 @@
             <!-- Login/Signup Screen -->
             <div id="login-screen" class="w-full flex flex-col items-center space-y-6">
                 <h2 class="text-2xl font-bold text-center">Welcome!</h2>
-                <div class="w-full max-w-md bg-gray-900 p-8 rounded-lg shadow-lg space-y-4">
+                <div class="w-full max-w-md bg-white p-8 rounded-lg shadow-lg space-y-4">
                     <form id="auth-form" class="space-y-4">
                         <input type="text" id="auth-name" placeholder="Full Name" class="input-field w-full px-4 py-2" required>
-                        <input type="text" id="auth-grade" placeholder="Grade (e.g., Grade 6)" class="input-field w-full px-4 py-2" required>
+                        <select id="auth-grade" class="input-field w-full px-4 py-2" required>
+                            <option value="">Select a Group</option>
+                            <option value="Grade 3">Grade 3 (Sat-Tue-4:50pm, Sun-Wed-4:50pm)</option>
+                            <option value="Grade 2">Grade 2 (Sat-Tue-5:50pm, Sun-Wed-6:50pm)</option>
+                            <option value="Grade 4">Grade 4 (Sat-Tue-6:75pm, Sun-Wed-5:50pm, Mon-Thu-7:00pm)</option>
+                            <option value="Grade 6">Grade 6 (Sat-Tue-8:00pm, Sun-Wed-8:50pm, Mon-Thu-8:25pm)</option>
+                            <option value="Grade 5">Grade 5 (Sun-Wed-7:50pm, Mon-Thu-5:50pm)</option>
+                        </select>
                         <input type="email" id="auth-email" placeholder="Email" class="input-field w-full px-4 py-2" required>
                         <input type="password" id="auth-password" placeholder="Password" class="input-field w-full px-4 py-2" required>
-                        <select id="auth-role" class="input-field w-full px-4 py-2">
-                            <option value="student">Student</option>
-                            <option value="teacher">Teacher</option>
-                            <option value="assistant">Assistant</option>
-                        </select>
                         <button type="submit" id="auth-submit-btn" class="btn-primary w-full text-center">Login</button>
                     </form>
                     <div class="text-center">
-                        <button id="toggle-auth-btn" class="text-sm text-purple-300 hover:underline">Don't have an account? Click to sign up</button>
+                        <button id="toggle-auth-btn" class="text-sm text-gray-600 hover:underline">Don't have an account? Click to sign up</button>
                     </div>
                 </div>
             </div>
@@ -150,9 +158,9 @@
             <div id="student-dashboard" class="w-full hidden">
                 <div class="space-y-6">
                     <h2 id="welcome-message" class="text-2xl font-bold text-center"></h2>
-                    <div id="progress-container" class="bg-gray-900 p-4 rounded-lg">
+                    <div id="progress-container" class="bg-gray-200 p-4 rounded-lg">
                          <h3 class="text-xl font-bold mb-2">Progress Indicator</h3>
-                         <div id="progress-bar-container" class="w-full h-4 bg-gray-700 rounded-full overflow-hidden">
+                         <div id="progress-bar-container" class="w-full h-4 bg-gray-400 rounded-full overflow-hidden">
                              <div id="progress-bar" class="h-full bg-purple-500 transition-all duration-500 ease-in-out" style="width: 0%;"></div>
                          </div>
                          <p id="progress-text" class="text-center text-sm mt-2"></p>
@@ -162,8 +170,8 @@
                         <!-- Countdown & Live Class Section -->
                         <div class="container-base p-6 space-y-4">
                             <h3 class="text-xl font-bold text-center">Next Class Time</h3>
-                            <div id="countdown" class="text-4xl font-mono text-center text-purple-300">Loading...</div>
-                            <div id="live-class-message" class="text-center text-2xl text-green-400 font-bold hidden">Class is live now!</div>
+                            <div id="countdown" class="text-4xl font-mono text-center text-purple-600">Loading...</div>
+                            <div id="live-class-message" class="text-center text-2xl text-green-600 font-bold hidden">Class is live now!</div>
                         </div>
 
                         <!-- Homework & Class Material Section -->
@@ -181,7 +189,7 @@
                     <!-- Chat Section -->
                     <div class="container-base p-6 space-y-4">
                         <h3 class="text-xl font-bold">Class Chat</h3>
-                        <div id="chat-messages" class="flex flex-col space-y-2 h-64 overflow-y-auto p-2 bg-gray-900 rounded-lg"></div>
+                        <div id="chat-messages" class="flex flex-col space-y-2 h-64 overflow-y-auto p-2 bg-gray-200 rounded-lg"></div>
                         <form id="chat-form" class="flex space-x-2">
                             <input type="text" id="chat-input" placeholder="Type your message..." class="input-field flex-grow px-4 py-2" required>
                             <button type="submit" class="btn-primary">Send</button>
@@ -212,13 +220,13 @@
                     <div id="content-manager" class="container-base p-6 space-y-6 hidden">
                         <h3 class="text-xl font-bold text-center">Content Management</h3>
                         <form id="content-form" class="space-y-4">
-                            <label class="block text-gray-300">Content Type:</label>
+                            <label class="block text-gray-700">Content Type:</label>
                             <select id="content-type-select" class="input-field w-full px-4 py-2">
                                 <option value="homework">Homework</option>
                                 <option value="class-material">Class Material</option>
                             </select>
                             <textarea id="content-text" rows="4" placeholder="Write homework or class content..." class="input-field w-full px-4 py-2"></textarea>
-                            <input type="file" id="content-image" class="w-full">
+                            <input type="file" id="content-image" class="w-full text-black">
                             <button type="submit" class="btn-primary w-full">Publish Content</button>
                         </form>
                         <button id="cancel-class-btn" class="btn-primary bg-red-500 hover:bg-red-600 w-full hidden">Cancel Next Class</button>
@@ -236,9 +244,9 @@
                         <select id="assistant-student-select" class="input-field w-full px-4 py-2"></select>
                         <textarea id="assistant-evaluation" rows="2" placeholder="Write student's evaluation..." class="input-field w-full px-4 py-2"></textarea>
                         <div class="flex items-center space-x-4">
-                            <label class="text-gray-300">Payment Status:</label>
+                            <label class="text-gray-700">Payment Status:</label>
                             <input type="checkbox" id="payment-checkbox" class="w-4 h-4 text-purple-600 bg-gray-100 rounded border-gray-300 focus:ring-purple-500">
-                            <label class="text-gray-300">Attendance Status:</label>
+                            <label class="text-gray-700">Attendance Status:</label>
                             <input type="checkbox" id="attendance-checkbox" class="w-4 h-4 text-purple-600 bg-gray-100 rounded border-gray-300 focus:ring-purple-500">
                         </div>
                         <button id="save-assistant-changes-btn" class="btn-primary w-full">Save Changes</button>
@@ -249,14 +257,14 @@
         </main>
 
         <!-- Footer -->
-        <footer class="text-center text-gray-400 mt-8">
+        <footer class="text-center text-gray-600 mt-8">
             <p>&copy; 2024 Mrs. Beba Fakhry Math. All rights reserved.</p>
         </footer>
     </div>
     
     <script type="module">
         import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, onSnapshot, query, where, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, onSnapshot, query, where, updateDoc, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 
         // Firebase Initialization
@@ -309,7 +317,6 @@
         const authGrade = document.getElementById('auth-grade');
         const authEmail = document.getElementById('auth-email');
         const authPassword = document.getElementById('auth-password');
-        const authRole = document.getElementById('auth-role');
         const authSubmitBtn = document.getElementById('auth-submit-btn');
         const toggleAuthBtn = document.getElementById('toggle-auth-btn');
         let isLoginMode = true;
@@ -355,6 +362,11 @@
             if (viewId === 'login') {
                 loginScreen.style.display = 'flex';
                 logoutBtn.classList.add('hidden');
+                // Ensure name and grade are visible on signup
+                authName.parentElement.classList.remove('hidden');
+                authGrade.parentElement.classList.remove('hidden');
+                authForm.querySelector('button').textContent = 'Sign Up';
+                toggleAuthBtn.textContent = "Already have an account? Click to login";
             } else if (viewId === 'student') {
                 studentDashboard.style.display = 'block';
                 logoutBtn.classList.remove('hidden');
@@ -371,8 +383,6 @@
         const getNextClassTime = (gradeSchedule) => {
             const now = new Date();
             const nowDay = now.getDay(); // 0 for Sunday, 6 for Saturday
-            const nowHour = now.getHours();
-            const nowMinute = now.getMinutes();
 
             let nextClass = null;
             let minDiff = Infinity;
@@ -521,7 +531,7 @@
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     const contentElement = document.createElement('div');
-                    contentElement.className = 'bg-gray-700 p-4 rounded-lg';
+                    contentElement.className = 'bg-gray-200 p-4 rounded-lg';
                     if (data.type === 'homework') {
                         contentElement.innerHTML = `<p>${data.text}</p>`;
                         homeworkContent.appendChild(contentElement);
@@ -570,7 +580,6 @@
         const selectGrade = async (gradeId) => {
             selectedGrade = gradeId;
             document.querySelectorAll('.grade-select-btn').forEach(btn => btn.classList.remove('active'));
-            // Find the button with the correct text content to add the active class
             const gradeName = gradesData.find(g => g.id === gradeId).name;
             for (const btn of document.querySelectorAll('.grade-select-btn')) {
                 if (btn.textContent === gradeName) {
@@ -600,16 +609,16 @@
                 snapshot.forEach(doc => {
                     const userData = doc.data();
                     const userDiv = document.createElement('div');
-                    userDiv.className = 'bg-gray-800 p-4 rounded-lg flex justify-between items-center';
+                    userDiv.className = 'bg-gray-200 p-4 rounded-lg flex justify-between items-center';
                     userDiv.innerHTML = `
                         <div>
                             <p class="font-bold">${userData.name}</p>
-                            <p class="text-sm text-gray-400">Email: ${userData.email}</p>
-                            <p class="text-sm text-gray-400">Role: ${userData.role}</p>
+                            <p class="text-sm text-gray-600">Email: ${userData.email}</p>
+                            <p class="text-sm text-gray-600">Role: ${userData.role}</p>
                         </div>
                         <div class="space-x-2">
-                            <button data-uid="${doc.id}" data-action="ban" class="text-red-400 hover:text-red-500">Ban</button>
-                            <button data-uid="${doc.id}" data-action="change-role" class="text-yellow-400 hover:text-yellow-500">Change Role</button>
+                            <button data-uid="${doc.id}" data-action="ban" class="text-red-600 hover:text-red-700">Ban</button>
+                            <button data-uid="${doc.id}" data-action="change-role" class="btn-primary">Change Role</button>
                         </div>
                     `;
                     userList.appendChild(userDiv);
@@ -638,8 +647,7 @@
             const grade = authGrade.value;
             const email = authEmail.value;
             const password = authPassword.value;
-            const role = authRole.value;
-
+            
             try {
                 if (isLoginMode) {
                     await signInWithEmailAndPassword(auth, email, password);
@@ -651,7 +659,7 @@
                         name: name,
                         email: email,
                         grade: grade,
-                        role: role,
+                        role: "student", // Default role for new signups
                         isBanned: false,
                         rank: 0,
                         isPaid: false,
@@ -672,13 +680,11 @@
                 toggleAuthBtn.textContent = "Don't have an account? Click to sign up";
                 authName.parentElement.classList.add('hidden');
                 authGrade.parentElement.classList.add('hidden');
-                authRole.parentElement.classList.add('hidden');
             } else {
                 authSubmitBtn.textContent = 'Sign Up';
                 toggleAuthBtn.textContent = "Already have an account? Click to login";
                 authName.parentElement.classList.remove('hidden');
                 authGrade.parentElement.classList.remove('hidden');
-                authRole.parentElement.classList.remove('hidden');
             }
         });
         
@@ -689,7 +695,7 @@
         chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const gradeData = getGradeData(userGrade);
-            if (!gradeInput.value || !chatInput.value.trim() || !gradeData) return;
+            if (!chatInput.value.trim() || !gradeData) return;
 
             await addDoc(collection(db, getChatCollectionPath(gradeData.id)), {
                 senderId: currentUserId,
