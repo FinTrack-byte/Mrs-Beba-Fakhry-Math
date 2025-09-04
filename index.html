@@ -1,27 +1,815 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Student Login</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mrs. Beba Fakhry Math</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f0f0f 0%, #200d3d 100%);
+            color: #f3f4f6;
+            min-height: 100vh;
+        }
+
+        .container-base {
+            background-color: #1a1a1a;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #6b21a8 0%, #a855f7 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .input-field {
+            background-color: #333;
+            color: #e2e8f0;
+            border: 1px solid #444;
+            border-radius: 0.5rem;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #a855f7;
+        }
+        
+        .chat-message {
+            max-width: 80%;
+            border-radius: 0.75rem;
+            padding: 0.5rem 1rem;
+            word-wrap: break-word;
+        }
+        .message-mine {
+            background-color: #a855f7;
+            align-self: flex-end;
+        }
+        .message-other {
+            background-color: #4a1f6a;
+            align-self: flex-start;
+        }
+        .message-user {
+             font-size: 0.8rem;
+             color: #d1d5db;
+        }
+        
+        .tab-button {
+            transition: background-color 0.3s ease;
+        }
+        .tab-button.active {
+            background-color: #a855f7;
+            color: white;
+        }
+
+        .grade-select-btn.active {
+            background-color: #a855f7;
+        }
+        
+        /* Custom scrollbar for chat */
+        .chat-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+        .chat-messages::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 10px;
+        }
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #a855f7;
+            border-radius: 10px;
+        }
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: #6b21a8;
+        }
+    </style>
 </head>
-<body>
-  <header>
-    <img src="https://i.postimg.cc/qR5R9jCn/Whats-App-Image-2025-09-03-at-00-39-38-697342ca.jpg" alt="Center Logo"> <!-- مكان اللوجو -->
-    <h2>Student Portal</h2>
-  </header>
+<body class="p-4 flex flex-col items-center justify-center">
 
-  <div class="container">
-    <h3>Login</h3>
-    <form id="loginForm">
-      <input type="email" id="loginEmail" placeholder="Email" required><br><br>
-      <input type="password" id="loginPassword" placeholder="Password" required><br><br>
-      <button type="submit">Login</button>
-    </form>
-    <p>Don’t have an account? <a href="signup.html">Sign Up</a></p>
-  </div>
+    <!-- Global Firebase variables -->
+    <script>
+        // These global variables are provided by the canvas environment
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = {
+            apiKey: "AIzaSyDpEzqrLHMhRvZHtFCQmaq7pIRTXT0gsSs",
+            authDomain: "mrs-beba-fakhry-math.firebaseapp.com",
+            projectId: "mrs-beba-fakhry-math",
+            storageBucket: "mrs-beba-fakhry-math.firebasestorage.app",
+            messagingSenderId: "492921712524",
+            appId: "1:492921712524:web:731bde5ea7c5d8332770a9",
+            measurementId: "G-4LWG6TF56T"
+        };
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+    </script>
 
-  <script src="app.js"></script>
+    <!-- UI Container -->
+    <div id="app-container" class="container-base w-full max-w-4xl p-6 lg:p-12 space-y-8 min-h-[90vh] flex flex-col justify-between">
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-white">Mrs. Beba Fakhry Math</h1>
+            <button id="logout-btn" class="text-white hover:text-red-400 hidden">Logout</button>
+        </header>
+
+        <!-- Main Content (Dynamic) -->
+        <main class="flex-grow flex flex-col justify-center items-center">
+            
+            <!-- Login/Signup Screen -->
+            <div id="login-screen" class="w-full flex flex-col items-center space-y-6">
+                <h2 class="text-2xl font-bold text-center">Welcome!</h2>
+                <div class="w-full max-w-md bg-gray-900 p-8 rounded-lg shadow-lg space-y-4">
+                    <form id="auth-form" class="space-y-4">
+                        <input type="text" id="auth-name" placeholder="Full Name" class="input-field w-full px-4 py-2" required>
+                        <input type="text" id="auth-grade" placeholder="Grade (e.g., Grade 6)" class="input-field w-full px-4 py-2" required>
+                        <input type="email" id="auth-email" placeholder="Email" class="input-field w-full px-4 py-2" required>
+                        <input type="password" id="auth-password" placeholder="Password" class="input-field w-full px-4 py-2" required>
+                        <select id="auth-role" class="input-field w-full px-4 py-2">
+                            <option value="student">Student</option>
+                            <option value="teacher">Teacher</option>
+                            <option value="assistant">Assistant</option>
+                        </select>
+                        <button type="submit" id="auth-submit-btn" class="btn-primary w-full text-center">Login</button>
+                    </form>
+                    <div class="text-center">
+                        <button id="toggle-auth-btn" class="text-sm text-purple-300 hover:underline">Don't have an account? Click to sign up</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Student Dashboard -->
+            <div id="student-dashboard" class="w-full hidden">
+                <div class="space-y-6">
+                    <h2 id="welcome-message" class="text-2xl font-bold text-center"></h2>
+                    <div id="progress-container" class="bg-gray-900 p-4 rounded-lg">
+                         <h3 class="text-xl font-bold mb-2">Progress Indicator</h3>
+                         <div id="progress-bar-container" class="w-full h-4 bg-gray-700 rounded-full overflow-hidden">
+                             <div id="progress-bar" class="h-full bg-purple-500 transition-all duration-500 ease-in-out" style="width: 0%;"></div>
+                         </div>
+                         <p id="progress-text" class="text-center text-sm mt-2"></p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Countdown & Live Class Section -->
+                        <div class="container-base p-6 space-y-4">
+                            <h3 class="text-xl font-bold text-center">Next Class Time</h3>
+                            <div id="countdown" class="text-4xl font-mono text-center text-purple-300">Loading...</div>
+                            <div id="live-class-message" class="text-center text-2xl text-green-400 font-bold hidden">Class is live now!</div>
+                        </div>
+
+                        <!-- Homework & Class Material Section -->
+                        <div class="container-base p-6 space-y-4">
+                            <h3 class="text-xl font-bold text-center mb-4">Homework & Class Materials</h3>
+                            <div class="flex justify-center mb-4 space-x-2">
+                                <button id="tab-homework" class="tab-button px-4 py-2 rounded-full active">Homework</button>
+                                <button id="tab-class-material" class="tab-button px-4 py-2 rounded-full">Class Material</button>
+                            </div>
+                            <div id="homework-content" class="space-y-4"></div>
+                            <div id="class-material-content" class="space-y-4 hidden"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Chat Section -->
+                    <div class="container-base p-6 space-y-4">
+                        <h3 class="text-xl font-bold">Class Chat</h3>
+                        <div id="chat-messages" class="flex flex-col space-y-2 h-64 overflow-y-auto p-2 bg-gray-900 rounded-lg"></div>
+                        <form id="chat-form" class="flex space-x-2">
+                            <input type="text" id="chat-input" placeholder="Type your message..." class="input-field flex-grow px-4 py-2" required>
+                            <button type="submit" class="btn-primary">Send</button>
+                        </form>
+                    </div>
+
+                    <!-- Student Profile -->
+                    <div class="container-base p-6 space-y-4">
+                        <h3 class="text-xl font-bold">My Profile</h3>
+                        <p id="student-name-display"></p>
+                        <p id="student-evaluation-display"></p>
+                        <p id="payment-status-display"></p>
+                        <p id="attendance-status-display"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Teacher/Assistant Dashboard -->
+            <div id="teacher-assistant-dashboard" class="w-full hidden">
+                <div class="space-y-6">
+                    <h2 id="dash-welcome" class="text-2xl font-bold text-center"></h2>
+                    <div class="flex justify-center flex-wrap gap-2 mb-4">
+                        <span class="text-xl">Select Grade:</span>
+                        <!-- Grade selection buttons will be populated here -->
+                    </div>
+
+                    <!-- Content Management Section -->
+                    <div id="content-manager" class="container-base p-6 space-y-6 hidden">
+                        <h3 class="text-xl font-bold text-center">Content Management</h3>
+                        <form id="content-form" class="space-y-4">
+                            <label class="block text-gray-300">Content Type:</label>
+                            <select id="content-type-select" class="input-field w-full px-4 py-2">
+                                <option value="homework">Homework</option>
+                                <option value="class-material">Class Material</option>
+                            </select>
+                            <textarea id="content-text" rows="4" placeholder="Write homework or class content..." class="input-field w-full px-4 py-2"></textarea>
+                            <input type="file" id="content-image" class="w-full">
+                            <button type="submit" class="btn-primary w-full">Publish Content</button>
+                        </form>
+                        <button id="cancel-class-btn" class="btn-primary bg-red-500 hover:bg-red-600 w-full hidden">Cancel Next Class</button>
+                    </div>
+                    
+                    <!-- User Management Section (for Teacher) -->
+                    <div id="user-manager" class="container-base p-6 space-y-4 hidden">
+                         <h3 class="text-xl font-bold text-center">Student Account Management</h3>
+                         <div id="user-list" class="space-y-4"></div>
+                    </div>
+
+                    <!-- Assistant Management Section -->
+                    <div id="assistant-manager" class="container-base p-6 space-y-4 hidden">
+                        <h3 class="text-xl font-bold text-center">Student Evaluation & Account Management</h3>
+                        <select id="assistant-student-select" class="input-field w-full px-4 py-2"></select>
+                        <textarea id="assistant-evaluation" rows="2" placeholder="Write student's evaluation..." class="input-field w-full px-4 py-2"></textarea>
+                        <div class="flex items-center space-x-4">
+                            <label class="text-gray-300">Payment Status:</label>
+                            <input type="checkbox" id="payment-checkbox" class="w-4 h-4 text-purple-600 bg-gray-100 rounded border-gray-300 focus:ring-purple-500">
+                            <label class="text-gray-300">Attendance Status:</label>
+                            <input type="checkbox" id="attendance-checkbox" class="w-4 h-4 text-purple-600 bg-gray-100 rounded border-gray-300 focus:ring-purple-500">
+                        </div>
+                        <button id="save-assistant-changes-btn" class="btn-primary w-full">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+            
+        </main>
+
+        <!-- Footer -->
+        <footer class="text-center text-gray-400 mt-8">
+            <p>&copy; 2024 Mrs. Beba Fakhry Math. All rights reserved.</p>
+        </footer>
+    </div>
+    
+    <script type="module">
+        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, onSnapshot, query, where, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+
+        // Firebase Initialization
+        let app, db, auth;
+        const initFirebase = async () => {
+            try {
+                if (!firebaseConfig.projectId) {
+                    console.error("Firebase config is missing projectId. Cannot initialize.");
+                    return;
+                }
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                console.log("Firebase initialized and authenticated.");
+            } catch (error) {
+                console.error("Firebase initialization failed: ", error);
+            }
+        };
+
+        let currentUserId = null;
+        let userRole = null;
+        let userGrade = null;
+        let userName = null;
+        let selectedGrade = null; // For teacher/assistant dashboards
+
+        const gradesData = [
+            { id: "grade_3", name: "Grade 3", schedules: ["Sat-Tue-4.5pm", "Sun-Wed-4.5pm"] },
+            { id: "grade_2", name: "Grade 2", schedules: ["Sat-Tue-5.5pm", "Sun-Wed-6.5pm"] },
+            { id: "grade_4", name: "Grade 4", schedules: ["Sat-Tue-6.75pm", "Sun-Wed-5.5pm", "Mon-Thu-7pm"] },
+            { id: "grade_6", name: "Grade 6", schedules: ["Sat-Tue-8pm", "Sun-Wed-8.5pm", "Mon-Thu-8.25pm"] },
+            { id: "grade_5", name: "Grade 5", schedules: ["Sun-Wed-7.5pm", "Mon-Thu-5.5pm"] }
+        ];
+
+        const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const classesPerStudent = 8;
+        
+        // UI Elements
+        const loginScreen = document.getElementById('login-screen');
+        const studentDashboard = document.getElementById('student-dashboard');
+        const teacherAssistantDashboard = document.getElementById('teacher-assistant-dashboard');
+        const logoutBtn = document.getElementById('logout-btn');
+        const authForm = document.getElementById('auth-form');
+        const authName = document.getElementById('auth-name');
+        const authGrade = document.getElementById('auth-grade');
+        const authEmail = document.getElementById('auth-email');
+        const authPassword = document.getElementById('auth-password');
+        const authRole = document.getElementById('auth-role');
+        const authSubmitBtn = document.getElementById('auth-submit-btn');
+        const toggleAuthBtn = document.getElementById('toggle-auth-btn');
+        let isLoginMode = true;
+
+        const welcomeMessage = document.getElementById('welcome-message');
+        const studentNameDisplay = document.getElementById('student-name-display');
+        const studentEvaluationDisplay = document.getElementById('student-evaluation-display');
+        const paymentStatusDisplay = document.getElementById('payment-status-display');
+        const attendanceStatusDisplay = document.getElementById('attendance-status-display');
+        const countdownElement = document.getElementById('countdown');
+        const liveClassMessage = document.getElementById('live-class-message');
+        const homeworkContent = document.getElementById('homework-content');
+        const classMaterialContent = document.getElementById('class-material-content');
+        const homeworkTabBtn = document.getElementById('tab-homework');
+        const classMaterialTabBtn = document.getElementById('tab-class-material');
+        const chatMessagesDiv = document.getElementById('chat-messages');
+        const chatForm = document.getElementById('chat-form');
+        const chatInput = document.getElementById('chat-input');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+
+        const dashWelcome = document.getElementById('dash-welcome');
+        const contentManager = document.getElementById('content-manager');
+        const userManager = document.getElementById('user-manager');
+        const assistantManager = document.getElementById('assistant-manager');
+        const contentForm = document.getElementById('content-form');
+        const contentTypeSelect = document.getElementById('content-type-select');
+        const contentText = document.getElementById('content-text');
+        const contentImage = document.getElementById('content-image');
+        const cancelClassBtn = document.getElementById('cancel-class-btn');
+        const userList = document.getElementById('user-list');
+        const assistantStudentSelect = document.getElementById('assistant-student-select');
+        const assistantEvaluationInput = document.getElementById('assistant-evaluation');
+        const paymentCheckbox = document.getElementById('payment-checkbox');
+        const attendanceCheckbox = document.getElementById('attendance-checkbox');
+        const saveAssistantChangesBtn = document.getElementById('save-assistant-changes-btn');
+
+        // Helper Functions
+        const showView = (viewId) => {
+            loginScreen.style.display = 'none';
+            studentDashboard.style.display = 'none';
+            teacherAssistantDashboard.style.display = 'none';
+            if (viewId === 'login') {
+                loginScreen.style.display = 'flex';
+                logoutBtn.classList.add('hidden');
+            } else if (viewId === 'student') {
+                studentDashboard.style.display = 'block';
+                logoutBtn.classList.remove('hidden');
+            } else if (viewId === 'teacher' || viewId === 'assistant') {
+                teacherAssistantDashboard.style.display = 'block';
+                logoutBtn.classList.remove('hidden');
+            }
+        };
+
+        const getGradeData = (grade) => {
+            return gradesData.find(g => g.name.toLowerCase() === grade.toLowerCase());
+        };
+
+        const getNextClassTime = (gradeSchedule) => {
+            const now = new Date();
+            const nowDay = now.getDay(); // 0 for Sunday, 6 for Saturday
+            const nowHour = now.getHours();
+            const nowMinute = now.getMinutes();
+
+            let nextClass = null;
+            let minDiff = Infinity;
+
+            for (const schedule of gradeSchedule) {
+                const [dayStr, timeStr] = schedule.split('-');
+                let dayIndex;
+                if (dayStr === "Sat") dayIndex = 6;
+                else if (dayStr === "Sun") dayIndex = 0;
+                else if (dayStr === "Mon") dayIndex = 1;
+                else if (dayStr === "Tue") dayIndex = 2;
+                else if (dayStr === "Wed") dayIndex = 3;
+                else if (dayStr === "Thu") dayIndex = 4;
+
+                const [hour, minute] = timeStr.replace('pm', '').split('.').map(Number);
+                const classHour = (hour < 12) ? hour + 12 : hour;
+                
+                let classTime = new Date(now);
+                classTime.setDate(now.getDate() + (dayIndex - nowDay + 7) % 7);
+                classTime.setHours(classHour);
+                classTime.setMinutes(minute);
+                classTime.setSeconds(0);
+                classTime.setMilliseconds(0);
+
+                if (classTime <= now) {
+                    classTime.setDate(classTime.getDate() + 7);
+                }
+
+                const diff = classTime - now;
+                if (diff < minDiff) {
+                    minDiff = diff;
+                    nextClass = classTime;
+                }
+            }
+            return nextClass;
+        };
+
+        const startCountdown = (nextClassTime) => {
+            const updateTimer = () => {
+                const now = new Date();
+                const diff = nextClassTime - now;
+
+                if (diff <= 0) {
+                    countdownElement.classList.add('hidden');
+                    liveClassMessage.classList.remove('hidden');
+                    clearInterval(countdownInterval);
+                    return;
+                }
+                
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+                countdownElement.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+            };
+
+            updateTimer();
+            const countdownInterval = setInterval(updateTimer, 1000);
+        };
+
+        // Firestore Paths
+        const getUserDocPath = (uid) => `artifacts/${appId}/users/${uid}/user_data/profile`;
+        const getGradeCollectionPath = (gradeId) => `artifacts/${appId}/public/data/grades/${gradeId}`;
+        const getChatCollectionPath = (gradeId) => `${getGradeCollectionPath(gradeId)}/chat`;
+        const getClassesCollectionPath = (gradeId) => `${getGradeCollectionPath(gradeId)}/classes`;
+        const getEvaluationsCollectionPath = (gradeId) => `${getGradeCollectionPath(gradeId)}/evaluations`;
+        const getPaymentsCollectionPath = (gradeId) => `${getGradeCollectionPath(gradeId)}/payments`;
+
+        // Authentication and Data Listeners
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUserId = user.uid;
+                const userDocRef = doc(db, getUserDocPath(currentUserId));
+                const userDocSnap = await getDoc(userDocRef);
+
+                if (userDocSnap.exists()) {
+                    const userData = userDocSnap.data();
+                    userRole = userData.role;
+                    userGrade = userData.grade;
+                    userName = userData.name;
+                    
+                    if (userRole === 'student') {
+                        renderStudentDashboard();
+                    } else if (userRole === 'teacher' || userRole === 'assistant') {
+                        renderTeacherAssistantDashboard();
+                    }
+                } else {
+                    // This case should not be reached after signup, but as a fallback
+                    console.log("User document not found. Redirecting to login.");
+                    showView('login');
+                }
+            } else {
+                showView('login');
+                currentUserId = null;
+                userRole = null;
+                userGrade = null;
+                userName = null;
+            }
+        });
+
+        // UI Rendering Functions
+        const renderStudentDashboard = async () => {
+            showView('student');
+            welcomeMessage.textContent = `Welcome, ${userName}`;
+            studentNameDisplay.textContent = `Name: ${userName}`;
+            
+            const gradeData = getGradeData(userGrade);
+            if (!gradeData) {
+                console.error("Grade data not found for:", userGrade);
+                return;
+            }
+
+            // Real-time Countdown
+            const nextClassTime = getNextClassTime(gradeData.schedules);
+            if (nextClassTime) {
+                startCountdown(nextClassTime);
+            }
+
+            // Real-time Chat
+            onSnapshot(query(collection(db, getChatCollectionPath(gradeData.id))), (snapshot) => {
+                chatMessagesDiv.innerHTML = '';
+                snapshot.docChanges().forEach(change => {
+                    if (change.type === "added") {
+                        const message = change.doc.data();
+                        const isMine = message.senderId === currentUserId;
+                        const messageDiv = document.createElement('div');
+                        messageDiv.className = `chat-message ${isMine ? 'message-mine' : 'message-other'}`;
+                        const usernameSpan = document.createElement('span');
+                        usernameSpan.className = 'message-user';
+                        usernameSpan.textContent = message.senderName + ": ";
+                        const textSpan = document.createElement('span');
+                        textSpan.textContent = message.text;
+                        messageDiv.appendChild(usernameSpan);
+                        messageDiv.appendChild(textSpan);
+                        chatMessagesDiv.appendChild(messageDiv);
+                        chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+                    }
+                });
+            });
+
+            // Real-time Homework & Class Materials
+            onSnapshot(query(collection(db, getClassesCollectionPath(gradeData.id))), (snapshot) => {
+                homeworkContent.innerHTML = '';
+                classMaterialContent.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const contentElement = document.createElement('div');
+                    contentElement.className = 'bg-gray-700 p-4 rounded-lg';
+                    if (data.type === 'homework') {
+                        contentElement.innerHTML = `<p>${data.text}</p>`;
+                        homeworkContent.appendChild(contentElement);
+                    } else if (data.type === 'class-material') {
+                        contentElement.innerHTML = `<p>${data.text}</p>`;
+                        classMaterialContent.appendChild(contentElement);
+                    }
+                });
+            });
+
+            // Real-time Student Evaluation, Payment, Attendance & Progress
+            onSnapshot(doc(db, getUserDocPath(currentUserId)), (docSnap) => {
+                if (docSnap.exists()) {
+                    const userData = docSnap.data();
+                    const evaluation = userData.evaluation || "Not yet evaluated.";
+                    const payment = userData.isPaid ? "Paid" : "Unpaid";
+                    const attendance = userData.attendedLastClass ? "Attended" : "Did not attend";
+                    const progress = userData.rank || 0;
+
+                    studentEvaluationDisplay.textContent = `Evaluation: ${evaluation}`;
+                    paymentStatusDisplay.textContent = `Payment Status: ${payment}`;
+                    attendanceStatusDisplay.textContent = `Attendance: ${attendance}`;
+                    
+                    const progressPercentage = (progress / classesPerStudent) * 100;
+                    progressBar.style.width = `${progressPercentage}%`;
+                    progressText.textContent = `Class ${progress} of ${classesPerStudent}`;
+                }
+            });
+        };
+        
+        const renderTeacherAssistantDashboard = () => {
+            showView('teacher');
+            dashWelcome.textContent = `Welcome, ${userName}`;
+
+            const gradeSelectionDiv = document.querySelector('.flex-wrap.gap-2');
+            gradeSelectionDiv.innerHTML = '<span class="text-xl">Select Grade:</span>';
+            gradesData.forEach(grade => {
+                const btn = document.createElement('button');
+                btn.textContent = grade.name;
+                btn.className = 'grade-select-btn px-4 py-2 rounded-full transition-colors duration-200';
+                btn.onclick = () => selectGrade(grade.id);
+                gradeSelectionDiv.appendChild(btn);
+            });
+        };
+
+        const selectGrade = async (gradeId) => {
+            selectedGrade = gradeId;
+            document.querySelectorAll('.grade-select-btn').forEach(btn => btn.classList.remove('active'));
+            // Find the button with the correct text content to add the active class
+            const gradeName = gradesData.find(g => g.id === gradeId).name;
+            for (const btn of document.querySelectorAll('.grade-select-btn')) {
+                if (btn.textContent === gradeName) {
+                    btn.classList.add('active');
+                    break;
+                }
+            }
+
+            contentManager.classList.remove('hidden');
+            if (userRole === 'teacher') {
+                userManager.classList.remove('hidden');
+                cancelClassBtn.classList.remove('hidden');
+                assistantManager.classList.add('hidden');
+                renderUserList(gradeId);
+            } else if (userRole === 'assistant') {
+                userManager.classList.add('hidden');
+                cancelClassBtn.classList.add('hidden');
+                assistantManager.classList.remove('hidden');
+                renderAssistantPanel(gradeId);
+            }
+        };
+
+        const renderUserList = (gradeId) => {
+            userList.innerHTML = '<p class="text-center text-gray-400">Loading students...</p>';
+            onSnapshot(query(collection(db, `artifacts/${appId}/users`), where("grade", "==", gradesData.find(g => g.id === gradeId).name)), (snapshot) => {
+                userList.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const userData = doc.data();
+                    const userDiv = document.createElement('div');
+                    userDiv.className = 'bg-gray-800 p-4 rounded-lg flex justify-between items-center';
+                    userDiv.innerHTML = `
+                        <div>
+                            <p class="font-bold">${userData.name}</p>
+                            <p class="text-sm text-gray-400">Email: ${userData.email}</p>
+                            <p class="text-sm text-gray-400">Role: ${userData.role}</p>
+                        </div>
+                        <div class="space-x-2">
+                            <button data-uid="${doc.id}" data-action="ban" class="text-red-400 hover:text-red-500">Ban</button>
+                            <button data-uid="${doc.id}" data-action="change-role" class="text-yellow-400 hover:text-yellow-500">Change Role</button>
+                        </div>
+                    `;
+                    userList.appendChild(userDiv);
+                });
+            });
+        };
+        
+        const renderAssistantPanel = (gradeId) => {
+            assistantStudentSelect.innerHTML = '<option value="">Select a student</option>';
+            onSnapshot(query(collection(db, `artifacts/${appId}/users`), where("grade", "==", gradesData.find(g => g.id === gradeId).name), where("role", "==", "student")), (snapshot) => {
+                assistantStudentSelect.innerHTML = '<option value="">Select a student</option>';
+                snapshot.forEach(doc => {
+                    const userData = doc.data();
+                    const option = document.createElement('option');
+                    option.value = doc.id;
+                    option.textContent = userData.name;
+                    assistantStudentSelect.appendChild(option);
+                });
+            });
+        };
+
+        // Event Listeners
+        authForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = authName.value;
+            const grade = authGrade.value;
+            const email = authEmail.value;
+            const password = authPassword.value;
+            const role = authRole.value;
+
+            try {
+                if (isLoginMode) {
+                    await signInWithEmailAndPassword(auth, email, password);
+                } else {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+                    const userDocRef = doc(db, getUserDocPath(user.uid));
+                    await setDoc(userDocRef, {
+                        name: name,
+                        email: email,
+                        grade: grade,
+                        role: role,
+                        isBanned: false,
+                        rank: 0,
+                        isPaid: false,
+                        attendedLastClass: false,
+                        evaluation: ""
+                    });
+                }
+            } catch (error) {
+                console.error("Authentication failed: ", error);
+                // In a real app, you would show a user-friendly error message here
+            }
+        });
+
+        toggleAuthBtn.addEventListener('click', () => {
+            isLoginMode = !isLoginMode;
+            if (isLoginMode) {
+                authSubmitBtn.textContent = 'Login';
+                toggleAuthBtn.textContent = "Don't have an account? Click to sign up";
+                authName.parentElement.classList.add('hidden');
+                authGrade.parentElement.classList.add('hidden');
+                authRole.parentElement.classList.add('hidden');
+            } else {
+                authSubmitBtn.textContent = 'Sign Up';
+                toggleAuthBtn.textContent = "Already have an account? Click to login";
+                authName.parentElement.classList.remove('hidden');
+                authGrade.parentElement.classList.remove('hidden');
+                authRole.parentElement.classList.remove('hidden');
+            }
+        });
+        
+        logoutBtn.addEventListener('click', async () => {
+            await signOut(auth);
+        });
+
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const gradeData = getGradeData(userGrade);
+            if (!gradeInput.value || !chatInput.value.trim() || !gradeData) return;
+
+            await addDoc(collection(db, getChatCollectionPath(gradeData.id)), {
+                senderId: currentUserId,
+                senderName: userName,
+                text: chatInput.value.trim(),
+                timestamp: new Date()
+            });
+            chatInput.value = '';
+        });
+
+        homeworkTabBtn.addEventListener('click', () => {
+            homeworkTabBtn.classList.add('active');
+            classMaterialTabBtn.classList.remove('active');
+            homeworkContent.classList.remove('hidden');
+            classMaterialContent.classList.add('hidden');
+        });
+
+        classMaterialTabBtn.addEventListener('click', () => {
+            classMaterialTabBtn.classList.add('active');
+            homeworkTabBtn.classList.remove('active');
+            classMaterialContent.classList.remove('hidden');
+            homeworkContent.classList.add('hidden');
+        });
+
+        contentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!selectedGrade) return;
+            const gradeData = gradesData.find(g => g.id === selectedGrade);
+            if (!gradeData) return;
+
+            const contentType = contentTypeSelect.value;
+            const contentTextValue = contentText.value;
+            // Image handling would require more complex logic and storage, for now we will just use text.
+            
+            await addDoc(collection(db, getClassesCollectionPath(gradeData.id)), {
+                type: contentType,
+                text: contentTextValue,
+                timestamp: new Date()
+            });
+
+            contentText.value = '';
+            alert('Content published successfully!');
+        });
+        
+        cancelClassBtn.addEventListener('click', async () => {
+            if (!selectedGrade) return;
+            const gradeData = gradesData.find(g => g.id === selectedGrade);
+            if (!gradeData) return;
+
+            const classesRef = collection(db, getClassesCollectionPath(gradeData.id));
+            const q = query(classesRef, where("type", "==", "class_cancelled"));
+            const querySnapshot = await getDocs(q);
+
+            if (querySnapshot.empty) {
+                await addDoc(classesRef, {
+                    type: "class_cancelled",
+                    timestamp: new Date()
+                });
+            } else {
+                // Class is already cancelled, maybe update it?
+                // For this example, we'll just log it.
+                console.log("Class is already marked as cancelled.");
+            }
+            alert('Next class has been marked as cancelled. The countdown will adjust.');
+        });
+
+        userList.addEventListener('click', async (e) => {
+            const btn = e.target.closest('button');
+            if (!btn) return;
+            const uid = btn.dataset.uid;
+            const action = btn.dataset.action;
+            const userDocRef = doc(db, getUserDocPath(uid));
+            
+            if (action === 'ban') {
+                await updateDoc(userDocRef, { isBanned: true });
+                alert('User has been banned.');
+            } else if (action === 'change-role') {
+                const newRole = prompt("Enter new role (student, teacher, assistant):");
+                if (newRole && ['student', 'teacher', 'assistant'].includes(newRole.toLowerCase())) {
+                    await updateDoc(userDocRef, { role: newRole });
+                    alert('User role has been updated.');
+                }
+            }
+        });
+
+        saveAssistantChangesBtn.addEventListener('click', async () => {
+            const selectedUid = assistantStudentSelect.value;
+            if (!selectedUid) return;
+
+            const userDocRef = doc(db, getUserDocPath(selectedUid));
+            const updates = {
+                evaluation: assistantEvaluationInput.value,
+                isPaid: paymentCheckbox.checked,
+                attendedLastClass: attendanceCheckbox.checked
+            };
+
+            await updateDoc(userDocRef, updates);
+            alert('Student data saved successfully.');
+        });
+        
+        assistantStudentSelect.addEventListener('change', async (e) => {
+            const selectedUid = e.target.value;
+            if (!selectedUid) {
+                assistantEvaluationInput.value = "";
+                paymentCheckbox.checked = false;
+                attendanceCheckbox.checked = false;
+                return;
+            }
+
+            const userDocRef = doc(db, getUserDocPath(selectedUid));
+            const docSnap = await getDoc(userDocRef);
+            if (docSnap.exists()) {
+                const userData = docSnap.data();
+                assistantEvaluationInput.value = userData.evaluation || "";
+                paymentCheckbox.checked = userData.isPaid || false;
+                attendanceCheckbox.checked = userData.attendedLastClass || false;
+            }
+        });
+
+        initFirebase();
+    </script>
 </body>
 </html>
