@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Student - Group</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<header>Student Page</header>
+<main class="container">
+  <section class="card">
+    <div class="row">
+      <div class="col">
+        <h3 id="groupName">Group</h3>
+        <div id="statusBadge"></div>
+        <div class="countdown" id="countdown">--:--:--</div>
+        <p>Current lesson number: <span id="lessonNumber">-</span> / 8</p>
+      </div>
+      <div class="col">
+        <h4>Attendance</h4>
+        <div id="attendance" class="item">Loading...</div>
+        <h4>Homework</h4>
+        <div id="homeworkList"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h3>Chat</h3>
+    <div class="chat-box" id="chatBox"></div>
+    <form id="chatForm"><input id="chatInput" placeholder="Write message..." required><button>Send</button></form>
+  </section>
+</main>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+<script src="../js/firebase-config.js"></script>
+<script src="../js/student.js"></script>
+</body>
+</html>
