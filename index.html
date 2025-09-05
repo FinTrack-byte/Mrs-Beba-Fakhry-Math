@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,6 +17,22 @@
         .bg-light-beige { background-color: #FBF6E7; }
         .bg-golden-yellow { background-color: #D6A461; }
         .text-golden-yellow { color: #D6A461; }
+        
+        /* Custom styles for select elements */
+        select.custom-select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg fill="%234B3A4D" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: left 0.75rem center;
+            background-size: 1.5em;
+            padding-left: 2.5rem;
+            padding-right: 1rem;
+        }
+        select.custom-select::-ms-expand {
+            display: none;
+        }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -37,20 +53,20 @@
     <!-- Reschedule Modal -->
     <div id="reschedule-modal-container" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm">
-            <h3 class="text-xl font-bold text-dark-purple mb-4">Reschedule Session</h3>
+            <h3 class="text-xl font-bold text-dark-purple mb-4">تغيير موعد الحصة</h3>
             <div class="space-y-4">
                 <div>
-                    <label for="reschedule-date" class="block text-sm font-medium text-gray-700">New Date</label>
+                    <label for="reschedule-date" class="block text-sm font-medium text-gray-700">تاريخ جديد</label>
                     <input type="date" id="reschedule-date" class="w-full px-3 py-2 border rounded-md focus:ring-golden-yellow focus:border-golden-yellow">
                 </div>
                 <div>
-                    <label for="reschedule-time" class="block text-sm font-medium text-gray-700">New Time (PM)</label>
+                    <label for="reschedule-time" class="block text-sm font-medium text-gray-700">وقت جديد</label>
                     <input type="time" id="reschedule-time" class="w-full px-3 py-2 border rounded-md focus:ring-golden-yellow focus:border-golden-yellow">
                 </div>
             </div>
             <div class="mt-6 flex justify-end space-x-2">
-                <button id="reschedule-cancel-button" class="px-4 py-2 bg-gray-200 text-dark-purple rounded-md font-semibold hover:bg-gray-300 transition">Cancel</button>
-                <button id="reschedule-save-button" class="px-4 py-2 bg-dark-purple text-white rounded-md font-semibold hover:bg-opacity-80 transition">Save</button>
+                <button id="reschedule-cancel-button" class="px-4 py-2 bg-gray-200 text-dark-purple rounded-md font-semibold hover:bg-gray-300 transition">إلغاء</button>
+                <button id="reschedule-save-button" class="px-4 py-2 bg-dark-purple text-white rounded-md font-semibold hover:bg-opacity-80 transition">حفظ</button>
             </div>
         </div>
     </div>
@@ -58,11 +74,36 @@
     <!-- Edit Material Modal -->
     <div id="edit-material-modal-container" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm">
-            <h3 class="text-xl font-bold text-dark-purple mb-4">Edit Material</h3>
+            <h3 class="text-xl font-bold text-dark-purple mb-4">تعديل المادة</h3>
             <textarea id="edit-material-text" rows="5" class="w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-golden-yellow"></textarea>
             <div class="mt-6 flex justify-end space-x-2">
-                <button id="edit-material-cancel-button" class="px-4 py-2 bg-gray-200 text-dark-purple rounded-md font-semibold hover:bg-gray-300 transition">Cancel</button>
-                <button id="edit-material-save-button" class="px-4 py-2 bg-dark-purple text-white rounded-md font-semibold hover:bg-opacity-80 transition">Save</button>
+                <button id="edit-material-cancel-button" class="px-4 py-2 bg-gray-200 text-dark-purple rounded-md font-semibold hover:bg-gray-300 transition">إلغاء</button>
+                <button id="edit-material-save-button" class="px-4 py-2 bg-dark-purple text-white rounded-md font-semibold hover:bg-opacity-80 transition">حفظ</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Create Exam Modal -->
+    <div id="create-exam-modal-container" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-xl my-8">
+            <h3 class="text-xl font-bold text-dark-purple mb-4">إنشاء امتحان جديد</h3>
+            <div class="space-y-4">
+                <div>
+                    <label for="exam-title" class="block text-sm font-medium text-gray-700">عنوان الامتحان</label>
+                    <input type="text" id="exam-title" placeholder="أدخل عنوان الامتحان" class="w-full px-3 py-2 border rounded-md focus:ring-golden-yellow focus:border-golden-yellow">
+                </div>
+                <div>
+                    <label for="exam-time-limit" class="block text-sm font-medium text-gray-700">الوقت الزمني (بالدقائق)</label>
+                    <input type="number" id="exam-time-limit" value="60" class="w-full px-3 py-2 border rounded-md focus:ring-golden-yellow focus:border-golden-yellow">
+                </div>
+                <div id="questions-container" class="space-y-6 border-t pt-4">
+                    <h4 class="font-bold text-lg text-dark-purple">الأسئلة</h4>
+                </div>
+            </div>
+            <div class="mt-6 flex justify-end space-x-2">
+                <button id="add-question-button" class="px-4 py-2 bg-golden-yellow text-dark-purple rounded-md font-semibold hover:bg-opacity-80 transition">إضافة سؤال</button>
+                <button id="save-exam-button" class="px-4 py-2 bg-dark-purple text-white rounded-md font-semibold hover:bg-opacity-80 transition">حفظ الامتحان</button>
+                <button id="cancel-create-exam-button" class="px-4 py-2 bg-gray-200 text-dark-purple rounded-md font-semibold hover:bg-gray-300 transition">إلغاء</button>
             </div>
         </div>
     </div>
@@ -71,7 +112,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, query, addDoc, getDocs, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, query, addDoc, getDocs, updateDoc, deleteDoc, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Your web app's Firebase configuration
         const firebaseConfig = {
@@ -84,7 +125,7 @@
           appId: "1:83946018492:web:3cfa51fa2ddebee27de2b9",
           measurementId: "G-PW83MCMQYK"
         };
-        const appId = firebaseConfig.appId.split(':')[2];
+        const appId = typeof __app_id !== 'undefined' ? __app_id : firebaseConfig.appId.split(':')[2];
 
         // Firebase Initialization
         let app, db, auth;
@@ -93,6 +134,9 @@
         let currentGroupId = null;
         let countdownInterval;
         let materialToEditIndex = null;
+        let examTimerInterval;
+        let currentExamId = null;
+        let examQuestions = [];
 
         // Schedules data
         const schedules = {
@@ -146,6 +190,18 @@
             document.getElementById('edit-material-modal-container').classList.add('hidden');
         };
 
+        const showCreateExamModal = () => {
+            document.getElementById('create-exam-modal-container').classList.remove('hidden');
+            document.getElementById('exam-title').value = '';
+            document.getElementById('exam-time-limit').value = 60;
+            document.getElementById('questions-container').innerHTML = '<h4 class="font-bold text-lg text-dark-purple">الأسئلة</h4>';
+            examQuestions = [];
+        };
+
+        const hideCreateExamModal = () => {
+            document.getElementById('create-exam-modal-container').classList.add('hidden');
+        };
+
         const renderLogin = () => {
             const container = document.getElementById('app-container');
             container.innerHTML = `
@@ -159,6 +215,22 @@
                 </div>
             `;
             document.getElementById('login-button').addEventListener('click', handleLogin);
+        };
+        
+        const renderSecretResultsPage = async () => {
+            const container = document.getElementById('app-container');
+            container.innerHTML = `
+                <div class="w-full max-w-4xl p-6 sm:p-8 bg-white rounded-2xl shadow-xl">
+                    <div class="flex items-center justify-between mb-8">
+                        <button onclick="renderLogin()" class="px-4 py-2 bg-gray-200 text-dark-purple rounded-lg font-semibold hover:bg-gray-300 transition">خروج</button>
+                        <h1 class="text-2xl sm:text-3xl font-bold text-dark-purple">النتائج السرية للامتحانات</h1>
+                    </div>
+                    <div id="results-list" class="space-y-6">
+                        <p class="text-center text-gray-500">جاري تحميل النتائج...</p>
+                    </div>
+                </div>
+            `;
+            await fetchAllExamSubmissions();
         };
 
         const renderStudentHome = () => {
@@ -286,24 +358,15 @@
                         </div>
                     ` : ''}
 
-                    <div id="notes-section" class="bg-light-beige p-6 rounded-lg shadow-md mb-8">
-                        <h2 class="text-lg font-bold text-dark-purple mb-4">مواد الحصة</h2>
-                        <div id="materials-container" class="space-y-4"></div>
-                        ${currentRole === 'teacher' || currentRole === 'assistant' ? `
-                            <div class="mt-6 border-t pt-4">
-                                <h3 class="font-semibold mb-2">إضافة مادة جديدة</h3>
-                                <div class="flex items-center space-x-4 mb-2">
-                                    <label for="material-type" class="text-sm font-medium">نوع المادة:</label>
-                                    <select id="material-type" class="rounded-md border p-1">
-                                        <option value="text">نص</option>
-                                        <option value="image">صورة</option>
-                                        <option value="video">فيديو (Terabox)</option>
-                                    </select>
-                                </div>
-                                <textarea id="new-material-text" placeholder="أدخل نص، رابط صورة، أو رابط فيديو..." rows="3" class="w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-golden-yellow"></textarea>
-                                <button id="add-material-button" class="mt-2 bg-dark-purple text-white px-4 py-2 rounded-lg font-semibold hover:bg-opacity-80 transition">إضافة مادة</button>
-                            </div>
-                        ` : ''}
+                    <!-- Tabs for Material and Exam -->
+                    <div class="flex justify-center space-x-4 mb-6">
+                        <button id="material-tab" class="px-4 py-2 rounded-lg font-semibold bg-dark-purple text-white">المواد العلمية</button>
+                        <button id="exam-tab" class="px-4 py-2 rounded-lg font-semibold bg-gray-200 text-dark-purple">الامتحانات</button>
+                    </div>
+
+                    <!-- Content Section for Tabs -->
+                    <div id="tab-content">
+                        <!-- Content will be injected here -->
                     </div>
 
                     <!-- Students Roster & Evaluation Section -->
@@ -332,21 +395,13 @@
             `;
             
             // Add listeners
+            document.getElementById('material-tab').addEventListener('click', () => switchTab('materials'));
+            document.getElementById('exam-tab').addEventListener('click', () => switchTab('exams'));
+
+            // Show initial tab content
+            switchTab('materials');
+
             if (currentRole === 'teacher' || currentRole === 'assistant') {
-                document.getElementById('add-material-button').addEventListener('click', addMaterial);
-                document.getElementById('material-type').addEventListener('change', (e) => {
-                    const textarea = document.getElementById('new-material-text');
-                    if (e.target.value === 'text') {
-                        textarea.placeholder = "أدخل نص، روابط، أو تفاصيل الواجبات...";
-                        textarea.rows = 3;
-                    } else if (e.target.value === 'image') {
-                        textarea.placeholder = "أدخل رابط الصورة...";
-                        textarea.rows = 1;
-                    } else {
-                        textarea.placeholder = "أدخل رابط فيديو Terabox...";
-                        textarea.rows = 1;
-                    }
-                });
                 document.getElementById('add-student-button').addEventListener('click', addStudent);
             }
             if (currentRole === 'teacher') {
@@ -356,8 +411,6 @@
                 document.getElementById('reschedule-session').addEventListener('click', showRescheduleModal);
                 document.getElementById('reschedule-cancel-button').addEventListener('click', hideRescheduleModal);
                 document.getElementById('reschedule-save-button').addEventListener('click', rescheduleNextSession);
-                document.getElementById('edit-material-cancel-button').addEventListener('click', hideEditMaterialModal);
-                document.getElementById('edit-material-save-button').addEventListener('click', saveEditedMaterial);
             }
             if (currentRole === 'assistant') {
                 document.getElementById('save-assistant-notes').addEventListener('click', saveAssistantNotes);
@@ -365,19 +418,15 @@
 
             // Start real-time listeners
             listenForGroupData(groupId);
-            if (currentRole === 'assistant') {
-                // Ensure userId is available before attempting to listen
-                if (userId) {
-                    listenForAssistantNotes();
-                } else {
-                    // Fallback in case userId is not yet set
-                    const authUnsubscribe = onAuthStateChanged(auth, (user) => {
-                        if (user) {
-                            listenForAssistantNotes();
-                            authUnsubscribe();
-                        }
-                    });
-                }
+            if (currentRole === 'assistant' && userId) {
+                listenForAssistantNotes();
+            } else if (currentRole === 'assistant') {
+                const authUnsubscribe = onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        listenForAssistantNotes();
+                        authUnsubscribe();
+                    }
+                });
             }
         };
 
@@ -395,19 +444,20 @@
                     db = getFirestore(app);
                     auth = getAuth(app);
 
-                    // Sign in anonymously or with custom token
                     if (typeof __initial_auth_token !== 'undefined') {
                         await signInWithCustomToken(auth, __initial_auth_token);
                     } else {
                         await signInAnonymously(auth);
                     }
 
-                    // Listen for auth state changes to set the user ID
                     onAuthStateChanged(auth, (user) => {
                         if (user) {
                             userId = user.uid;
                         } else {
                             userId = null;
+                        }
+                        if (document.getElementById('exams-tab')) {
+                            switchTab('exams'); // Re-render exams tab to update button state
                         }
                     });
                 }
@@ -419,6 +469,8 @@
 
         const handleLogin = async () => {
             const password = document.getElementById('password-input').value;
+            // Introduce a short delay to ensure Firebase auth state is ready
+            await new Promise(resolve => setTimeout(resolve, 2000));
             switch (password) {
                 case '00192':
                     renderStudentHome();
@@ -429,22 +481,517 @@
                 case '912912':
                     renderAssistantHome();
                     break;
+                case '999999':
+                    renderSecretResultsPage();
+                    break;
                 default:
                     showModal("كلمة مرور غير صالحة", "كلمة المرور التي أدخلتها غير صحيحة. يرجى المحاولة مرة أخرى.");
                     break;
             }
         };
 
+        const switchTab = (tab) => {
+            const materialTab = document.getElementById('material-tab');
+            const examTab = document.getElementById('exam-tab');
+            const tabContent = document.getElementById('tab-content');
+
+            if (tab === 'materials') {
+                materialTab.classList.add('bg-dark-purple', 'text-white');
+                materialTab.classList.remove('bg-gray-200', 'text-dark-purple');
+                examTab.classList.remove('bg-dark-purple', 'text-white');
+                examTab.classList.add('bg-gray-200', 'text-dark-purple');
+                renderMaterialsTab();
+            } else if (tab === 'exams') {
+                examTab.classList.add('bg-dark-purple', 'text-white');
+                examTab.classList.remove('bg-dark-purple', 'text-white');
+                materialTab.classList.remove('bg-dark-purple', 'text-white');
+                materialTab.classList.add('bg-gray-200', 'text-dark-purple');
+                renderExamsTab();
+            }
+        };
+
+        const renderMaterialsTab = () => {
+            const tabContent = document.getElementById('tab-content');
+            tabContent.innerHTML = `
+                <div id="notes-section" class="bg-light-beige p-6 rounded-lg shadow-md mb-8">
+                    <h2 class="text-lg font-bold text-dark-purple mb-4">مواد الحصة</h2>
+                    <div id="materials-container" class="space-y-4"></div>
+                    ${currentRole === 'teacher' || currentRole === 'assistant' ? `
+                        <div class="mt-6 border-t pt-4">
+                            <h3 class="font-semibold mb-2">إضافة مادة جديدة</h3>
+                            <div class="flex items-center space-x-4 mb-2">
+                                <label for="material-type" class="text-sm font-medium">نوع المادة:</label>
+                                <select id="material-type" class="rounded-md border p-1 custom-select">
+                                    <option value="text">نص</option>
+                                    <option value="image">صورة</option>
+                                    <option value="video">فيديو (Terabox)</option>
+                                </select>
+                            </div>
+                            <textarea id="new-material-text" placeholder="أدخل نص، رابط صورة، أو رابط فيديو..." rows="3" class="w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-golden-yellow"></textarea>
+                            <button id="add-material-button" class="mt-2 bg-dark-purple text-white px-4 py-2 rounded-lg font-semibold hover:bg-opacity-80 transition">إضافة مادة</button>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            if (currentRole === 'teacher' || currentRole === 'assistant') {
+                document.getElementById('add-material-button').addEventListener('click', addMaterial);
+                document.getElementById('material-type').addEventListener('change', (e) => {
+                    const textarea = document.getElementById('new-material-text');
+                    if (e.target.value === 'text') {
+                        textarea.placeholder = "أدخل نص، روابط، أو تفاصيل الواجبات...";
+                        textarea.rows = 3;
+                    } else if (e.target.value === 'image') {
+                        textarea.placeholder = "أدخل رابط الصورة...";
+                        textarea.rows = 1;
+                    } else {
+                        textarea.placeholder = "أدخل رابط فيديو Terabox...";
+                        textarea.rows = 1;
+                    }
+                });
+            }
+            listenForGroupData(currentGroupId); // Reload material data
+        };
+
+        const renderExamsTab = async () => {
+            const tabContent = document.getElementById('tab-content');
+            tabContent.innerHTML = `
+                <div id="exams-section" class="bg-light-beige p-6 rounded-lg shadow-md mb-8">
+                    <h2 class="text-lg font-bold text-dark-purple mb-4">الامتحانات المتاحة</h2>
+                    <div id="exams-list-container" class="space-y-4">
+                        <p class="text-center text-gray-500">جاري تحميل الامتحانات...</p>
+                    </div>
+                    ${currentRole === 'teacher' || currentRole === 'assistant' ? `
+                        <div class="mt-6 border-t pt-4">
+                            <button id="create-exam-button" class="bg-dark-purple text-white px-4 py-2 rounded-lg font-semibold hover:bg-opacity-80 transition">إضافة امتحان جديد</button>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            if (currentRole === 'teacher' || currentRole === 'assistant') {
+                document.getElementById('create-exam-button').addEventListener('click', showCreateExamModal);
+                document.getElementById('add-question-button').addEventListener('click', addQuestionToModal);
+                document.getElementById('save-exam-button').addEventListener('click', saveExam);
+                document.getElementById('cancel-create-exam-button').addEventListener('click', hideCreateExamModal);
+            }
+            await fetchExams(currentGroupId);
+        };
+
+        const renderExamTakingPage = async (examId) => {
+            console.log("Rendering exam page for userId:", userId);
+            const examDocRef = doc(db, `artifacts/${appId}/public/data/groups/${currentGroupId}/exams`, examId);
+            const submissionCollectionRef = collection(db, `artifacts/${appId}/public/data/groups/${currentGroupId}/exams/${examId}/submissions`);
+            const q = query(submissionCollectionRef, where('userId', '==', userId));
+            const submissionDocs = await getDocs(q);
+
+            if (!userId) {
+                showModal("خطأ", "لم يتم تسجيل دخول المستخدم. يرجى المحاولة مرة أخرى.");
+                return;
+            }
+
+            if (!submissionDocs.empty) {
+                showModal("تم حل الامتحان", "لقد قمت بحل هذا الامتحان بالفعل.");
+                return;
+            }
+
+            const docSnap = await getDoc(examDocRef);
+            if (!docSnap.exists()) {
+                showModal("خطأ", "هذا الامتحان غير موجود.");
+                return;
+            }
+
+            const examData = docSnap.data();
+            currentExamId = examId;
+
+            const timeLimitInMs = examData.timeLimit * 60 * 1000;
+            const startTime = new Date().getTime();
+            const endTime = startTime + timeLimitInMs;
+
+            const container = document.getElementById('app-container');
+            container.innerHTML = `
+                <div class="w-full max-w-2xl p-6 sm:p-8 bg-white rounded-2xl shadow-xl">
+                    <div class="flex items-center justify-between mb-8">
+                        <h1 class="text-2xl sm:text-3xl font-bold text-dark-purple">${examData.title}</h1>
+                        <span id="exam-timer" class="text-xl font-bold text-red-500"></span>
+                    </div>
+                    <form id="exam-form" class="space-y-6">
+                        <div class="bg-light-beige p-4 rounded-md shadow-inner">
+                            <label for="student-name" class="block font-semibold text-dark-purple mb-2">اسم الطالب (إجباري):</label>
+                            <input type="text" id="student-name-input" name="student-name" placeholder="أدخل اسمك الكامل" required class="w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-golden-yellow">
+                        </div>
+                        <div id="questions-form-container"></div>
+                        <button type="submit" class="w-full bg-dark-purple text-white py-3 rounded-lg font-semibold hover:bg-opacity-80 transition">إرسال الامتحان</button>
+                    </form>
+                </div>
+            `;
+            
+            const questionsContainer = document.getElementById('questions-form-container');
+            questionsContainer.innerHTML = examData.questions.map((q, index) => {
+                let questionHtml = `
+                    <div class="bg-white p-4 rounded-md shadow-inner">
+                        <p class="font-semibold text-dark-purple mb-2">سؤال ${index + 1}: ${q.question}</p>
+                `;
+                if (q.type === 'choose') {
+                    questionHtml += `<div class="space-y-2">`;
+                    q.options.forEach((option, optIndex) => {
+                        questionHtml += `
+                            <div class="flex items-center">
+                                <input type="radio" id="q${index}-opt${optIndex}" name="question-${index}" value="${option}" class="text-golden-yellow focus:ring-golden-yellow">
+                                <label for="q${index}-opt${optIndex}" class="ml-2">${option}</label>
+                            </div>
+                        `;
+                    });
+                    questionHtml += `</div>`;
+                } else if (q.type === 'complete') {
+                    questionHtml += `
+                        <input type="text" name="question-${index}" placeholder="أكمل الفراغ..." class="w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-golden-yellow">
+                    `;
+                } else if (q.type === 'story') {
+                    questionHtml += `
+                        <textarea name="question-${index}" placeholder="أدخل إجابتك هنا..." rows="4" class="w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-golden-yellow"></textarea>
+                    `;
+                }
+                questionHtml += `</div>`;
+                return questionHtml;
+            }).join('');
+
+            document.getElementById('exam-form').addEventListener('submit', (e) => submitExam(e, examData.questions));
+
+            examTimerInterval = setInterval(() => {
+                const now = new Date().getTime();
+                const distance = endTime - now;
+                
+                if (distance < 0) {
+                    clearInterval(examTimerInterval);
+                    submitExam(null, examData.questions, true);
+                    return;
+                }
+
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                document.getElementById('exam-timer').innerText = `الوقت المتبقي: ${minutes}:${String(seconds).padStart(2, '0')}`;
+            }, 1000);
+        };
+
+        const submitExam = async (e, questions, isAutomatic = false) => {
+            if (e) e.preventDefault();
+            clearInterval(examTimerInterval);
+
+            const form = document.getElementById('exam-form');
+            const formData = new FormData(form);
+            const studentName = formData.get('student-name');
+
+            const answers = [];
+            let correctAnswers = 0;
+
+            questions.forEach((q, index) => {
+                const studentAnswer = formData.get(`question-${index}`);
+                let isCorrect = false;
+                if (q.type === 'choose' || q.type === 'complete') {
+                    isCorrect = studentAnswer && studentAnswer.trim().toLowerCase() === q.correctAnswer.trim().toLowerCase();
+                } else {
+                    isCorrect = false; // Story problems are not auto-graded
+                }
+                answers.push({
+                    question: q.question,
+                    studentAnswer: studentAnswer,
+                    correctAnswer: q.correctAnswer,
+                    isCorrect: isCorrect,
+                    type: q.type
+                });
+                if (isCorrect) correctAnswers++;
+            });
+
+            const totalScore = questions.filter(q => q.type !== 'story').length;
+            const score = totalScore > 0 ? `${correctAnswers}/${totalScore}` : 'N/A';
+            const grade = Math.floor((correctAnswers / totalScore) * 100) || 0;
+
+            const submissionData = {
+                studentName: studentName,
+                answers: JSON.stringify(answers), // Serialize for Firestore
+                score: score,
+                grade: grade,
+                submittedAt: new Date().toISOString(),
+                isAutomatic: isAutomatic,
+                userId: userId // Use unique user ID to prevent multiple submissions
+            };
+
+            const submissionCollectionRef = collection(db, `artifacts/${appId}/public/data/groups/${currentGroupId}/exams/${currentExamId}/submissions`);
+            await addDoc(submissionCollectionRef, submissionData);
+
+            renderExamResultPage(submissionData, questions);
+        };
+
+        const renderExamResultPage = (submissionData, questions) => {
+            const container = document.getElementById('app-container');
+            const answers = JSON.parse(submissionData.answers);
+
+            container.innerHTML = `
+                <div class="w-full max-w-2xl p-6 sm:p-8 bg-white rounded-2xl shadow-xl">
+                    <h1 class="text-2xl sm:text-3xl font-bold text-dark-purple mb-4">نتائج الامتحان</h1>
+                    <p class="mb-4 text-center">الاسم: ${submissionData.studentName}</p>
+                    <p class="text-xl font-bold text-center mb-6">النتيجة: ${submissionData.score}</p>
+                    <div id="answers-list" class="space-y-4 mb-6">
+                        ${answers.map((answer, index) => {
+                            const isCorrect = answer.isCorrect;
+                            const colorClass = isCorrect ? 'text-green-600' : 'text-red-600';
+                            let answerDetails = '';
+                            if (answer.type !== 'story') {
+                                answerDetails = `
+                                    <p class="font-semibold ${colorClass}">${isCorrect ? 'إجابة صحيحة' : 'إجابة خاطئة'}</p>
+                                    <p>إجابتك: ${answer.studentAnswer || 'لم يتم الإجابة'}</p>
+                                    <p>الإجابة الصحيحة: ${answer.correctAnswer}</p>
+                                `;
+                            } else {
+                                answerDetails = `
+                                    <p>إجابتك: ${answer.studentAnswer || 'لم يتم الإجابة'}</p>
+                                `;
+                            }
+                            return `
+                                <div class="bg-gray-100 p-4 rounded-md shadow-inner">
+                                    <p class="font-bold">سؤال ${index + 1}: ${answer.question}</p>
+                                    ${answerDetails}
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    <button id="whatsapp-share-button" class="w-full bg-green-500 text-white py-3 rounded-lg font-semibold hover:bg-green-600 transition">
+                        إرسال النتيجة على واتساب
+                    </button>
+                    <button onclick="goBack()" class="w-full mt-4 bg-gray-200 text-dark-purple py-3 rounded-lg font-semibold hover:bg-gray-300 transition">
+                        العودة للصفحة الرئيسية
+                    </button>
+                </div>
+            `;
+            const shareButton = document.getElementById('whatsapp-share-button');
+            shareButton.addEventListener('click', () => {
+                const message = `
+نتائج امتحان الطالب: ${submissionData.studentName}
+النتيجة: ${submissionData.score}
+التاريخ: ${new Date().toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' })}
+`.trim();
+                const whatsappUrl = `https://wa.me/201202603629?text=${encodeURIComponent(message)}`;
+                window.open(whatsappUrl, '_blank');
+            });
+        };
+
+        const fetchExams = async (groupId) => {
+            const examsCollectionRef = collection(db, `artifacts/${appId}/public/data/groups/${groupId}/exams`);
+            const querySnapshot = await getDocs(examsCollectionRef);
+            const exams = [];
+            querySnapshot.forEach(doc => {
+                exams.push({ id: doc.id, ...doc.data() });
+            });
+            updateExamsUI(exams);
+        };
+
+        const updateExamsUI = (exams) => {
+            const examsListContainer = document.getElementById('exams-list-container');
+            if (!examsListContainer) return;
+            
+            examsListContainer.innerHTML = exams.length > 0 ? exams.map(exam => `
+                <div class="bg-white p-4 rounded-md shadow-inner flex justify-between items-center">
+                    <div>
+                        <h3 class="font-bold text-dark-purple">${exam.title}</h3>
+                        <p class="text-sm text-gray-500">وقت الامتحان: ${exam.timeLimit} دقيقة</p>
+                    </div>
+                    <div class="flex space-x-2">
+                        ${currentRole === 'student' ? `
+                            <button onclick="renderExamTakingPage('${exam.id}')" class="bg-dark-purple text-white px-3 py-1 rounded-md text-sm hover:bg-opacity-80 transition">بدء الامتحان</button>
+                        ` : `
+                            <button onclick="deleteExam('${exam.id}')" class="bg-red-500 text-white px-3 py-1 rounded-md text-sm hover:bg-red-600 transition">حذف</button>
+                        `}
+                    </div>
+                </div>
+            `).join('') : '<p class="text-center text-gray-500">لا توجد امتحانات متاحة حالياً.</p>';
+        };
+
+        const saveExam = async () => {
+            const title = document.getElementById('exam-title').value.trim();
+            const timeLimit = parseInt(document.getElementById('exam-time-limit').value, 10);
+            
+            if (!title || isNaN(timeLimit) || examQuestions.length === 0) {
+                showModal("حقول ناقصة", "يرجى ملء جميع الحقول وإضافة سؤال واحد على الأقل.");
+                return;
+            }
+
+            const examsCollectionRef = collection(db, `artifacts/${appId}/public/data/groups/${currentGroupId}/exams`);
+            await addDoc(examsCollectionRef, {
+                title: title,
+                timeLimit: timeLimit,
+                questions: examQuestions,
+                createdAt: new Date().toISOString()
+            });
+
+            hideCreateExamModal();
+            showModal("تم الحفظ", "تم حفظ الامتحان بنجاح.");
+            fetchExams(currentGroupId);
+        };
+
+        const addQuestionToModal = () => {
+            const questionsContainer = document.getElementById('questions-container');
+            const questionIndex = examQuestions.length;
+
+            const questionHtml = `
+                <div id="question-${questionIndex}" class="p-4 bg-gray-100 rounded-md shadow-inner">
+                    <div class="flex justify-between items-center mb-2">
+                        <h5 class="font-bold text-sm">سؤال جديد</h5>
+                        <button onclick="removeQuestion(${questionIndex})" class="text-red-500 hover:text-red-700 transition">حذف</button>
+                    </div>
+                    <div class="flex items-center space-x-4 mb-2">
+                        <label for="q-type-${questionIndex}" class="text-sm">نوع السؤال:</label>
+                        <select id="q-type-${questionIndex}" onchange="updateQuestionType(${questionIndex}, this.value)" class="rounded-md border p-1 text-sm custom-select">
+                            <option value="choose">اختيار من متعدد</option>
+                            <option value="complete">أكمل</option>
+                            <option value="story">مسألة كلامية</option>
+                        </select>
+                    </div>
+                    <input type="text" id="q-text-${questionIndex}" placeholder="أدخل نص السؤال" class="w-full px-2 py-1 border rounded-md mb-2">
+                    <div id="options-container-${questionIndex}">
+                        <input type="text" id="q-correct-answer-${questionIndex}" placeholder="الإجابة الصحيحة" class="w-full px-2 py-1 border rounded-md mb-2">
+                        <input type="text" id="q-option-1-${questionIndex}" placeholder="خيار 1" class="w-full px-2 py-1 border rounded-md mb-1">
+                        <input type="text" id="q-option-2-${questionIndex}" placeholder="خيار 2" class="w-full px-2 py-1 border rounded-md mb-1">
+                        <input type="text" id="q-option-3-${questionIndex}" placeholder="خيار 3" class="w-full px-2 py-1 border rounded-md mb-1">
+                        <input type="text" id="q-option-4-${questionIndex}" placeholder="خيار 4" class="w-full px-2 py-1 border rounded-md mb-1">
+                    </div>
+                </div>
+            `;
+            questionsContainer.insertAdjacentHTML('beforeend', questionHtml);
+
+            // Add an empty object to the array to be filled later
+            examQuestions.push({ type: 'choose', question: '', correctAnswer: '', options: [] });
+        };
+        
+        const updateQuestionType = (index, type) => {
+            const optionsContainer = document.getElementById(`options-container-${index}`);
+            examQuestions[index].type = type;
+            if (type === 'choose') {
+                optionsContainer.innerHTML = `
+                    <input type="text" id="q-correct-answer-${index}" placeholder="الإجابة الصحيحة" class="w-full px-2 py-1 border rounded-md mb-2">
+                    <input type="text" id="q-option-1-${index}" placeholder="خيار 1" class="w-full px-2 py-1 border rounded-md mb-1">
+                    <input type="text" id="q-option-2-${index}" placeholder="خيار 2" class="w-full px-2 py-1 border rounded-md mb-1">
+                    <input type="text" id="q-option-3-${index}" placeholder="خيار 3" class="w-full px-2 py-1 border rounded-md mb-1">
+                    <input type="text" id="q-option-4-${index}" placeholder="خيار 4" class="w-full px-2 py-1 border rounded-md mb-1">
+                `;
+            } else if (type === 'complete') {
+                 optionsContainer.innerHTML = `
+                    <input type="text" id="q-correct-answer-${index}" placeholder="الإجابة الصحيحة" class="w-full px-2 py-1 border rounded-md mb-2">
+                `;
+            } else if (type === 'story') {
+                 optionsContainer.innerHTML = '';
+            }
+        };
+
+        const removeQuestion = (index) => {
+            document.getElementById(`question-${index}`).remove();
+            examQuestions.splice(index, 1);
+        };
+        
+        const saveExamQuestion = (index) => {
+            const questionText = document.getElementById(`q-text-${index}`).value.trim();
+            const type = examQuestions[index].type;
+
+            examQuestions[index].question = questionText;
+            
+            if (type === 'choose') {
+                const correctAnswer = document.getElementById(`q-correct-answer-${index}`).value.trim();
+                const options = [];
+                for (let i = 1; i <= 4; i++) {
+                    const optionValue = document.getElementById(`q-option-${i}-${index}`).value.trim();
+                    if (optionValue) options.push(optionValue);
+                }
+                examQuestions[index].correctAnswer = correctAnswer;
+                examQuestions[index].options = options;
+            } else if (type === 'complete') {
+                const correctAnswer = document.getElementById(`q-correct-answer-${index}`).value.trim();
+                examQuestions[index].correctAnswer = correctAnswer;
+            }
+        };
+
+        const fetchAllExamSubmissions = async () => {
+            const resultsList = document.getElementById('results-list');
+            resultsList.innerHTML = '<p class="text-center text-gray-500">جاري تحميل النتائج...</p>';
+            
+            const allSubmissions = [];
+            const groups = Object.values(schedules).flat();
+
+            for (const group of groups) {
+                const examsCollectionRef = collection(db, `artifacts/${appId}/public/data/groups/${group.id}/exams`);
+                const examSnapshots = await getDocs(examsCollectionRef);
+
+                for (const examDoc of examSnapshots.docs) {
+                    const submissionsCollectionRef = collection(db, `artifacts/${appId}/public/data/groups/${group.id}/exams/${examDoc.id}/submissions`);
+                    const submissionSnapshots = await getDocs(submissionsCollectionRef);
+
+                    submissionSnapshots.forEach(subDoc => {
+                        const subData = subDoc.data();
+                        allSubmissions.push({
+                            id: subDoc.id,
+                            examTitle: examDoc.data().title,
+                            group: group.grade,
+                            ...subData
+                        });
+                    });
+                }
+            }
+
+            if (allSubmissions.length === 0) {
+                resultsList.innerHTML = '<p class="text-center text-gray-500">لا توجد أي نتائج لعرضها.</p>';
+            } else {
+                resultsList.innerHTML = allSubmissions.map(sub => {
+                    const submissionDate = new Date(sub.submittedAt).toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
+                    const submissionTime = new Date(sub.submittedAt).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+
+                    const answers = JSON.parse(sub.answers);
+                    const isAutomatic = sub.isAutomatic ? '<span class="text-red-500">(آلي)</span>' : '';
+
+                    return `
+                        <div class="bg-light-beige p-6 rounded-lg shadow-md">
+                            <h3 class="font-bold text-dark-purple mb-2">امتحان: ${sub.examTitle} (${sub.group})</h3>
+                            <p class="mb-1">الطالب: ${sub.studentName}</p>
+                            <p class="mb-1">النتيجة: ${sub.score}</p>
+                            <p class="text-sm text-gray-500">تم الإرسال: ${submissionDate} في ${submissionTime} ${isAutomatic}</p>
+                            <div class="mt-4 border-t pt-4 space-y-2">
+                                <h4 class="font-bold">الإجابات:</h4>
+                                ${answers.map((ans, index) => `
+                                    <div class="p-2 bg-white rounded-md">
+                                        <p class="font-semibold">سؤال ${index + 1}: ${ans.question}</p>
+                                        <p>إجابة الطالب: ${ans.studentAnswer || 'لم يتم الإجابة'}</p>
+                                        ${ans.type !== 'story' ? `<p class="font-semibold text-green-600">الإجابة الصحيحة: ${ans.correctAnswer}</p>` : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        };
+
+        const deleteExam = async (examId) => {
+            if (!currentGroupId) return;
+            const examDocRef = doc(db, `artifacts/${appId}/public/data/groups/${currentGroupId}/exams`, examId);
+            try {
+                // Delete submissions first
+                const submissionsCollectionRef = collection(db, `artifacts/${appId}/public/data/groups/${currentGroupId}/exams/${examId}/submissions`);
+                const subDocs = await getDocs(submissionsCollectionRef);
+                const deletePromises = subDocs.docs.map(d => deleteDoc(d.ref));
+                await Promise.all(deletePromises);
+                
+                await deleteDoc(examDocRef);
+                showModal("تم حذف الامتحان", "تمت إزالة الامتحان بنجاح.");
+                fetchExams(currentGroupId);
+            } catch (e) {
+                console.error("Error deleting exam:", e);
+                showModal("خطأ", "فشل في حذف الامتحان. يرجى المحاولة مرة أخرى.");
+            }
+        };
+
         const listenForGroupData = (groupId) => {
             const groupDocRef = doc(db, `artifacts/${appId}/public/data/groups`, groupId);
-            // This listener will fail if your Firestore security rules do not allow reads and writes
-            // تأكد من أن قواعد أمان Firestore تسمح بالقراءة والكتابة
             onSnapshot(groupDocRef, (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     updateGroupPageUI(data);
                 } else {
-                    // Initialize if the document doesn't exist
                     setDoc(groupDocRef, {
                         lessonNumber: 1,
                         nextSessionTimestamp: calculateNextSessionTimestamp(groupId),
@@ -456,10 +1003,7 @@
                 showModal("خطأ", "تعذر تحميل بيانات الفصل. يرجى محاولة التحديث.");
             });
 
-            // Listen for students data in a sub-collection
             const studentsCollectionRef = collection(db, `artifacts/${appId}/public/data/groups/${groupId}/students`);
-            // This listener also needs read/write permissions from your security rules
-            // هذا المستمع يحتاج أيضًا إلى أذونات القراءة/الكتابة من قواعد الأمان الخاصة بك
             onSnapshot(studentsCollectionRef, async (querySnapshot) => {
                 const students = [];
                 querySnapshot.forEach(doc => {
@@ -483,10 +1027,8 @@
                     if (mat.type === 'image') {
                         contentHTML = `<img src="${mat.value}" alt="Lesson Material" class="w-full h-auto rounded-md object-cover">`;
                     } else if (mat.type === 'video') {
-                        // Terabox links are not embeddable, so we provide a clickable link
                         contentHTML = `<a href="${mat.value}" target="_blank" class="text-blue-600 underline hover:no-underline">مشاهدة الفيديو على Terabox</a>`;
                     } else {
-                        // Default to text
                         contentHTML = `<p class="whitespace-pre-wrap">${mat.value}</p>`;
                     }
 
@@ -508,14 +1050,12 @@
                 }).join('');
             }
 
-            // Countdown timer
             clearInterval(countdownInterval);
             countdownInterval = setInterval(() => {
                 const now = new Date().getTime();
                 const distance = data.nextSessionTimestamp - now;
                 
                 if (distance < 0) {
-                    // If countdown is expired, display a message and trigger a refresh of the timestamp in Firestore.
                     countdownEl.innerText = "انتهت الحصة";
                     updateDoc(doc(db, `artifacts/${appId}/public/data/groups`, currentGroupId), {
                         nextSessionTimestamp: calculateNextSessionTimestamp(currentGroupId)
@@ -561,7 +1101,6 @@
                 </div>
             `).join('');
 
-            // Add event listeners for teachers and assistants
             if (currentRole === 'teacher' || currentRole === 'assistant') {
                 document.querySelectorAll('.paid-checkbox').forEach(checkbox => {
                     checkbox.addEventListener('change', (e) => handleStudentUpdate(e.target.dataset.studentId, 'paid', e.target.checked));
@@ -718,8 +1257,6 @@
         const listenForAssistantNotes = () => {
             if (!userId) return;
             const notesDocRef = doc(db, `artifacts/${appId}/users/${userId}/notes`, 'main');
-            // This listener will fail if your Firestore security rules do not allow reads and writes
-            // هذا المستمع يحتاج أيضًا إلى أذونات القراءة/الكتابة من قواعد الأمان الخاصة بك
             onSnapshot(notesDocRef, (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
@@ -752,13 +1289,12 @@
             
             let nextSession = new Date(now);
             
-            // This function finds the next occurrence of a specific day of the week, starting from a given date.
             const findNextDayOfWeek = (startDate, dayIndex) => {
                 const resultDate = new Date(startDate);
                 resultDate.setHours(startHour + 12, startMinute, 0, 0);
                 
                 let dayDifference = (dayIndex + 7 - resultDate.getDay()) % 7;
-                if (dayDifference === 0) { // If it's today, check the time
+                if (dayDifference === 0) {
                     if (resultDate.getTime() <= startDate.getTime()) {
                         dayDifference = 7;
                     }
@@ -775,20 +1311,22 @@
             return finalNextSession.getTime();
         };
 
-        // Initialize on window load
         window.onload = async () => {
             await initializeFirebase();
             renderLogin();
             document.getElementById('modal-ok-button').addEventListener('click', hideModal);
         };
         
-        // Make functions globally accessible for inline HTML calls after they are defined.
         window.renderLogin = renderLogin;
         window.viewGroup = renderGroupPage;
         window.goBack = goBack;
         window.deleteStudent = deleteStudent;
         window.deleteMaterial = deleteMaterial;
         window.editMaterial = editMaterial;
+        window.renderExamTakingPage = renderExamTakingPage;
+        window.deleteExam = deleteExam;
+        window.removeQuestion = removeQuestion;
+        window.updateQuestionType = updateQuestionType;
     </script>
 </body>
 </html>
