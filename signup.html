@@ -3,26 +3,86 @@
 <head>
   <meta charset="UTF-8">
   <title>Sign Up</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      width: 400px;
+      text-align: center;
+    }
+    .container img {
+      width: 80px;
+      margin-bottom: 15px;
+    }
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background: #218838;
+    }
+    a {
+      display: block;
+      margin-top: 15px;
+      color: #0066cc;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
-  <h2>Sign Up</h2>
-  <form id="signupForm">
-    <input type="text" id="name" placeholder="Full Name" required><br>
-    <input type="email" id="email" placeholder="Email" required><br>
-    <input type="password" id="password" placeholder="Password" required><br>
-    <select id="role">
-      <option value="student">Student</option>
-      <option value="teacher">Teacher</option>
-      <option value="assistant">Assistant</option>
-    </select><br>
-    <select id="grade">
-      <option value="Grade 3 Sat Tue 4:30pm">Grade 3 Sat Tue 4:30pm</option>
-      <option value="Grade 2 Sat Tue 5:30pm">Grade 2 Sat Tue 5:30pm</option>
-      <option value="Grade 4 Sat Tue 6:45pm">Grade 4 Sat Tue 6:45pm</option>
-      <option value="Grade 6 Sat Tue 8:00pm">Grade 6 Sat Tue 8:00pm</option>
-    </select><br>
-    <button type="submit">Sign Up</button>
-  </form>
+  <div class="container">
+    <img src="https://i.postimg.cc/285r37QM/1111111111111.jpg" alt="Logo">
+    <h2>Create Account</h2>
+    <form id="signupForm">
+      <input type="text" id="name" placeholder="Full Name" required>
+      <input type="email" id="email" placeholder="Email" required>
+      <input type="password" id="password" placeholder="Password" required>
+      <select id="role">
+        <option value="student">Student</option>
+        <option value="teacher">Teacher</option>
+        <option value="assistant">Assistant</option>
+      </select>
+      <select id="grade">
+        <option value="Grade 3 Sat Tue 4:30pm">Grade 3 Sat Tue 4:30pm</option>
+        <option value="Grade 2 Sat Tue 5:30pm">Grade 2 Sat Tue 5:30pm</option>
+        <option value="Grade 4 Sat Tue 6:45pm">Grade 4 Sat Tue 6:45pm</option>
+        <option value="Grade 6 Sat Tue 8:00pm">Grade 6 Sat Tue 8:00pm</option>
+      </select>
+      <button type="submit">Sign Up</button>
+    </form>
+    <a href="login.html">Already have an account? Login</a>
+  </div>
 
   <script type="module">
     import { rtdb } from './firebase-config.js';
@@ -40,7 +100,6 @@
       const grade = document.getElementById('grade').value;
 
       try {
-        // Generate new account
         const newAccountRef = push(ref(rtdb, 'accounts'));
         await set(newAccountRef, {
           name: name,
