@@ -1,27 +1,24 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getAuth } from "firebase/auth";
 import { getDatabase } from "firebase/database";
-import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyA0Tv7E-6tmvvXR5_8YutEDogi1TngjE4k",
-  authDomain: "fspo-ffacf.firebaseapp.com",
-  databaseURL: "https://fspo-ffacf-default-rtdb.firebaseio.com",
-  projectId: "fspo-ffacf",
-  storageBucket: "fspo-ffacf.appspot.com",
-  messagingSenderId: "319463993206",
-  appId: "1:319463993206:web:50983d2c717beadc86d457",
-  measurementId: "G-SVYH07LHE5"
+  apiKey: "AIzaSyDdLJq7F6r6O9XZTQTIpwdrLR0ZySLGQrY",
+  authDomain: "shkl-1db60.firebaseapp.com",
+  databaseURL: "https://shkl-1db60-default-rtdb.firebaseio.com",
+  projectId: "shkl-1db60",
+  storageBucket: "shkl-1db60.appspot.com",
+  messagingSenderId: "83946018492",
+  appId: "1:83946018492:web:3cfa51fa2ddebee27de2b9",
+  measurementId: "G-PW83MCMQYK"
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 
-// Export services to use them in other files
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+// Export database
 export const rtdb = getDatabase(app);
+
