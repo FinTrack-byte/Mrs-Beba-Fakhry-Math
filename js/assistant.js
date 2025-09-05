@@ -8,7 +8,7 @@ const sel = document.getElementById('groupSelect');
 groups.forEach(g=>{ const o = document.createElement('option'); o.value=g; o.innerText=g.replace(/-/g,' '); sel.appendChild(o); });
 sel.addEventListener('change', loadStudents);
 function loadStudents(){
-  const groupId = sel.value;
+  const groupId = sel.value; 
   const list = document.getElementById('studentsList');
   list.innerHTML='Loading...';
   db.collection('users').where('group','==',groupId).get().then(snap=>{
