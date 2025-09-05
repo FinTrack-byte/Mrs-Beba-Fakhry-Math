@@ -9,7 +9,7 @@ groups.forEach(g=>{ const o=document.createElement('option'); o.value=g; o.inner
 sel.addEventListener('change', loadMeta);
 function loadMeta(){ const gid = sel.value; db.collection('groups').doc(gid).get().then(doc=>{ const d=doc.data()||{}; document.getElementById('lessonNumber').value=d.lessonNumber||1; }); }
 async function updateLesson(){
-  const gid = sel.value; const val = parseInt(document.getElementById('lessonNumber').value)||1;
+  const gid = sel.value; const val = parseInt(document.getElementById('lessonNumber').value)||1; 
   await db.collection('groups').doc(gid).set({lessonNumber:val,active:false,cancelled:false},{merge:true});
   alert('Lesson number updated');
 }
