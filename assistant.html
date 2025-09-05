@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Assistant Dashboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #eef2f3; margin: 0; padding: 0; }
+    header { background: #4CAF50; color: white; padding: 15px; text-align: center; }
+    img { width: 60px; vertical-align: middle; }
+    .container { padding: 20px; }
+    input, select { margin: 5px; padding: 8px; }
+    button { background: #f44336; color: #fff; border: none; padding: 10px; margin: 5px; border-radius: 5px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="https://i.postimg.cc/285r37QM/1111111111111.jpg" alt="logo"> Assistant Dashboard
+  </header>
+  <div class="container">
+    <h2>Evaluate Students</h2>
+    <select id="classSelect">
+      <option>Grade 3 Sat-Tue 4:30 pm</option>
+      <option>Grade 2 Sat-Tue 5:30 pm</option>
+      <option>Grade 4 Sat-Tue 6:45 pm</option>
+      <option>Grade 6 Sat-Tue 8:00 pm</option>
+      <option>Grade 3 Sun-Wed 4:30 pm</option>
+      <option>Grade 4 Sun-Wed 5:30 pm</option>
+      <option>Grade 2 Sun-Wed 6:30 pm</option>
+      <option>Grade 5 Sun-Wed 7:30 pm</option>
+      <option>Grade 6 Sun-Wed 8:30 pm</option>
+      <option>Grade 5 Mon-Thu 5:30 pm</option>
+      <option>Grade 4 Mon-Thu 7:00 pm</option>
+      <option>Grade 6 Mon-Thu 8:15 pm</option>
+    </select>
+    <br>
+    <input type="text" id="studentName" placeholder="Student name">
+    <input type="text" id="evaluation" placeholder="Evaluation">
+    <br>
+    <button onclick="saveEvaluation()">Save Evaluation</button>
+    <br><br>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <script type="module">
+    import { logoutUser } from "./app.js";
+    window.logout = logoutUser;
+    window.saveEvaluation = () => {
+      const s = document.getElementById("studentName").value;
+      const e = document.getElementById("evaluation").value;
+      alert("Evaluation saved for " + s + ": " + e);
+    }
+  </script>
+</body>
+</html>
