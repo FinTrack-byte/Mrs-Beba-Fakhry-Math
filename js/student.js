@@ -8,7 +8,7 @@ const lessonNumberEl = document.getElementById('lessonNumber');
 // realtime group meta
 const groupRef = db.collection('groups').doc(groupId);
 
-// ensure group doc exists with default fields
+// ensure group doc exists with default fields 
 groupRef.get().then(doc=>{ if(!doc.exists){ groupRef.set({lessonNumber:1,active:false,cancelled:false}); }});
 
 // listen for meta changes
