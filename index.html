@@ -119,10 +119,10 @@
             container.innerHTML = `
                 <div class="bg-white p-8 sm:p-12 rounded-2xl shadow-xl w-full max-w-sm text-center">
                     <img src="https://i.postimg.cc/285r37QM/1111111111111.jpg" alt="Logo" class="mx-auto w-48 mb-8 rounded-full">
-                    <h1 class="text-3xl font-bold mb-6 text-dark-purple">Welcome</h1>
+                    <h1 class="text-3xl font-bold mb-6 text-dark-purple">مرحباً</h1>
                     <div class="space-y-4">
-                        <input id="password-input" type="password" placeholder="Enter Password" class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:outline-none focus:ring-2 focus:ring-golden-yellow">
-                        <button id="login-button" class="w-full bg-dark-purple text-white py-3 rounded-lg font-semibold hover:bg-opacity-80 transition">Login</button>
+                        <input id="password-input" type="password" placeholder="أدخل كلمة المرور" class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:outline-none focus:ring-2 focus:ring-golden-yellow">
+                        <button id="login-button" class="w-full bg-dark-purple text-white py-3 rounded-lg font-semibold hover:bg-opacity-80 transition">تسجيل الدخول</button>
                     </div>
                 </div>
             `;
@@ -135,8 +135,8 @@
             container.innerHTML = `
                 <div class="w-full max-w-2xl p-6 sm:p-8 bg-white rounded-2xl shadow-xl">
                     <div class="flex items-center justify-between mb-8">
-                        <h1 class="text-2xl sm:text-3xl font-bold text-dark-purple">Student Dashboard</h1>
-                        <button onclick="renderLogin()" class="px-4 py-2 bg-gray-200 text-dark-purple rounded-lg font-semibold hover:bg-gray-300 transition">Logout</button>
+                        <h1 class="text-2xl sm:text-3xl font-bold text-dark-purple">لوحة تحكم الطالب</h1>
+                        <button onclick="renderLogin()" class="px-4 py-2 bg-gray-200 text-dark-purple rounded-lg font-semibold hover:bg-gray-300 transition">خروج</button>
                     </div>
                     <div class="space-y-6">
                         ${Object.keys(schedules).map(day => `
@@ -164,8 +164,8 @@
             container.innerHTML = `
                 <div class="w-full max-w-2xl p-6 sm:p-8 bg-white rounded-2xl shadow-xl">
                     <div class="flex items-center justify-between mb-8">
-                        <h1 class="text-2xl sm:text-3xl font-bold text-dark-purple">Teacher Dashboard</h1>
-                        <button onclick="renderLogin()" class="px-4 py-2 bg-gray-200 text-dark-purple rounded-lg font-semibold hover:bg-gray-300 transition">Logout</button>
+                        <h1 class="text-2xl sm:text-3xl font-bold text-dark-purple">لوحة تحكم المعلمة</h1>
+                        <button onclick="renderLogin()" class="px-4 py-2 bg-gray-200 text-dark-purple rounded-lg font-semibold hover:bg-gray-300 transition">خروج</button>
                     </div>
                     <div class="space-y-6">
                         ${Object.keys(schedules).map(day => `
@@ -193,10 +193,10 @@
             container.innerHTML = `
                 <div class="w-full max-w-2xl p-6 sm:p-8 bg-white rounded-2xl shadow-xl">
                     <div class="flex items-center justify-between mb-8">
-                        <h1 class="text-2xl sm:text-3xl font-bold text-dark-purple">Assistant Dashboard</h1>
-                        <button onclick="renderLogin()" class="px-4 py-2 bg-gray-200 text-dark-purple rounded-lg font-semibold hover:bg-gray-300 transition">Logout</button>
+                        <h1 class="text-2xl sm:text-3xl font-bold text-dark-purple">لوحة تحكم المساعدة</h1>
+                        <button onclick="renderLogin()" class="px-4 py-2 bg-gray-200 text-dark-purple rounded-lg font-semibold hover:bg-gray-300 transition">خروج</button>
                     </div>
-                    <p class="mb-4 text-sm text-gray-500">Your User ID: ${userId}</p>
+                    <p class="mb-4 text-sm text-gray-500">معرف المستخدم الخاص بك: ${userId}</p>
                     <div class="space-y-6">
                         ${Object.keys(schedules).map(day => `
                             <div>
@@ -224,17 +224,17 @@
             container.innerHTML = `
                 <div class="w-full max-w-3xl p-6 sm:p-8 bg-white rounded-2xl shadow-xl">
                     <div class="flex items-center justify-between mb-8">
-                        <button onclick="goBack()" class="px-4 py-2 bg-gray-200 text-dark-purple rounded-lg font-semibold hover:bg-gray-300 transition">Back</button>
+                        <button onclick="goBack()" class="px-4 py-2 bg-gray-200 text-dark-purple rounded-lg font-semibold hover:bg-gray-300 transition">رجوع</button>
                         <h1 class="text-2xl sm:text-3xl font-bold text-dark-purple">${groupData.grade} - ${groupData.days}</h1>
                     </div>
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
                         <div class="bg-light-beige p-6 rounded-lg shadow-md text-center">
-                            <h2 class="text-lg font-bold text-dark-purple mb-2">Next Session Countdown</h2>
+                            <h2 class="text-lg font-bold text-dark-purple mb-2">العد التنازلي للحصة القادمة</h2>
                             <p id="countdown" class="text-4xl font-mono text-golden-yellow">--:--:--</p>
                         </div>
                         <div class="bg-light-beige p-6 rounded-lg shadow-md text-center">
-                            <h2 class="text-lg font-bold text-dark-purple mb-2">Lesson Number</h2>
+                            <h2 class="text-lg font-bold text-dark-purple mb-2">رقم الحصة</h2>
                             <div class="flex items-center justify-center space-x-4">
                                 ${currentRole === 'teacher' ? `
                                     <button id="decrement-lesson" class="bg-dark-purple text-white px-3 py-1 rounded-md">-</button>
@@ -249,33 +249,33 @@
                     
                     ${currentRole === 'teacher' ? `
                         <div class="flex justify-center space-x-4 mb-6">
-                            <button id="reschedule-session" class="bg-dark-purple text-white py-2 px-4 rounded-lg font-semibold hover:bg-opacity-80 transition">Reschedule Session</button>
-                            <button id="skip-next-session" class="bg-red-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-700 transition">Skip Next Session</button>
+                            <button id="reschedule-session" class="bg-dark-purple text-white py-2 px-4 rounded-lg font-semibold hover:bg-opacity-80 transition">تغيير موعد الحصة</button>
+                            <button id="skip-next-session" class="bg-red-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-700 transition">تخطي الحصة القادمة</button>
                         </div>
                     ` : ''}
 
                     <div id="notes-section" class="bg-light-beige p-6 rounded-lg shadow-md mb-8">
-                        <h2 class="text-lg font-bold text-dark-purple mb-4">Class Materials</h2>
+                        <h2 class="text-lg font-bold text-dark-purple mb-4">مواد الحصة</h2>
                         <div id="materials-container" class="space-y-4"></div>
                         ${currentRole === 'teacher' ? `
                             <div class="mt-6 border-t pt-4">
-                                <h3 class="font-semibold mb-2">Add New Material</h3>
-                                <textarea id="new-material-text" placeholder="Enter text, links, or homework details..." rows="3" class="w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-golden-yellow"></textarea>
-                                <button id="add-material-button" class="mt-2 bg-dark-purple text-white px-4 py-2 rounded-lg font-semibold hover:bg-opacity-80 transition">Add Material</button>
+                                <h3 class="font-semibold mb-2">إضافة مادة جديدة</h3>
+                                <textarea id="new-material-text" placeholder="أدخل نصوص، روابط، أو تفاصيل الواجبات..." rows="3" class="w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-golden-yellow"></textarea>
+                                <button id="add-material-button" class="mt-2 bg-dark-purple text-white px-4 py-2 rounded-lg font-semibold hover:bg-opacity-80 transition">إضافة مادة</button>
                             </div>
                         ` : ''}
                     </div>
 
                     <!-- Students Roster & Evaluation Section -->
                     <div id="students-section" class="bg-light-beige p-6 rounded-lg shadow-md mb-8">
-                        <h2 class="text-lg font-bold text-dark-purple mb-4">Student Roster and Evaluations</h2>
+                        <h2 class="text-lg font-bold text-dark-purple mb-4">قائمة الطلاب والتقييمات</h2>
                         <div id="students-list-container" class="space-y-4"></div>
                         ${currentRole === 'teacher' || currentRole === 'assistant' ? `
                             <div class="mt-6 border-t pt-4">
-                                <h3 class="font-semibold mb-2">Add New Student</h3>
+                                <h3 class="font-semibold mb-2">إضافة طالب جديد</h3>
                                 <div class="flex space-x-2">
-                                    <input id="new-student-name" type="text" placeholder="Student Name" class="w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-golden-yellow">
-                                    <button id="add-student-button" class="bg-dark-purple text-white px-4 py-2 rounded-lg font-semibold hover:bg-opacity-80 transition">Add Student</button>
+                                    <input id="new-student-name" type="text" placeholder="اسم الطالب" class="w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-golden-yellow">
+                                    <button id="add-student-button" class="bg-dark-purple text-white px-4 py-2 rounded-lg font-semibold hover:bg-opacity-80 transition">إضافة طالب</button>
                                 </div>
                             </div>
                         ` : ''}
@@ -283,9 +283,9 @@
 
                     ${currentRole === 'assistant' ? `
                         <div id="assistant-notes-section" class="bg-golden-yellow bg-opacity-20 p-6 rounded-lg shadow-md">
-                            <h2 class="text-lg font-bold text-dark-purple mb-4">Assistant Notes (Private)</h2>
-                            <textarea id="assistant-notes-text" placeholder="Add notes about payments or other details..." rows="5" class="w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-golden-yellow"></textarea>
-                            <button id="save-assistant-notes" class="mt-2 bg-dark-purple text-white px-4 py-2 rounded-lg font-semibold hover:bg-opacity-80 transition">Save Notes</button>
+                            <h2 class="text-lg font-bold text-dark-purple mb-4">ملاحظات المساعدة (خاصة)</h2>
+                            <textarea id="assistant-notes-text" placeholder="أضف ملاحظات حول المدفوعات أو تفاصيل أخرى..." rows="5" class="w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-golden-yellow"></textarea>
+                            <button id="save-assistant-notes" class="mt-2 bg-dark-purple text-white px-4 py-2 rounded-lg font-semibold hover:bg-opacity-80 transition">حفظ الملاحظات</button>
                         </div>
                     ` : ''}
                 </div>
@@ -311,7 +311,18 @@
             // Start real-time listeners
             listenForGroupData(groupId);
             if (currentRole === 'assistant') {
-                listenForAssistantNotes();
+                // Ensure userId is available before attempting to listen
+                if (userId) {
+                    listenForAssistantNotes();
+                } else {
+                    // Fallback in case userId is not yet set
+                    const authUnsubscribe = onAuthStateChanged(auth, (user) => {
+                        if (user) {
+                            listenForAssistantNotes();
+                            authUnsubscribe();
+                        }
+                    });
+                }
             }
         };
 
@@ -336,15 +347,18 @@
                         await signInAnonymously(auth);
                     }
 
+                    // Listen for auth state changes to set the user ID
                     onAuthStateChanged(auth, (user) => {
                         if (user) {
                             userId = user.uid;
+                        } else {
+                            userId = null;
                         }
                     });
                 }
             } catch (e) {
                 console.error("Error initializing Firebase:", e);
-                showModal("Error", "Failed to initialize the app. Please check the console for details.");
+                showModal("خطأ", "فشل في تهيئة التطبيق. يرجى مراجعة وحدة التحكم للحصول على التفاصيل.");
             }
         };
 
@@ -361,13 +375,15 @@
                     renderAssistantHome();
                     break;
                 default:
-                    showModal("Invalid Password", "The password you entered is incorrect. Please try again.");
+                    showModal("كلمة مرور غير صالحة", "كلمة المرور التي أدخلتها غير صحيحة. يرجى المحاولة مرة أخرى.");
                     break;
             }
         };
 
         const listenForGroupData = (groupId) => {
             const groupDocRef = doc(db, `artifacts/${appId}/public/data/groups`, groupId);
+            // This listener will fail if your Firestore security rules do not allow reads and writes
+            // تأكد من أن قواعد أمان Firestore تسمح بالقراءة والكتابة
             onSnapshot(groupDocRef, (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
@@ -382,11 +398,13 @@
                 }
             }, (error) => {
                 console.error("Error listening to group data:", error);
-                showModal("Error", "Could not load class data. Please try refreshing.");
+                showModal("خطأ", "تعذر تحميل بيانات الفصل. يرجى محاولة التحديث.");
             });
 
             // Listen for students data in a sub-collection
             const studentsCollectionRef = collection(db, `artifacts/${appId}/public/data/groups/${groupId}/students`);
+            // This listener also needs read/write permissions from your security rules
+            // هذا المستمع يحتاج أيضًا إلى أذونات القراءة/الكتابة من قواعد الأمان الخاصة بك
             onSnapshot(studentsCollectionRef, async (querySnapshot) => {
                 const students = [];
                 querySnapshot.forEach(doc => {
@@ -418,7 +436,7 @@
                 
                 if (distance < 0) {
                     // If countdown is expired, display a message and trigger a refresh of the timestamp in Firestore.
-                    countdownEl.innerText = "Session Expired";
+                    countdownEl.innerText = "انتهت الحصة";
                     updateDoc(doc(db, `artifacts/${appId}/public/data/groups`, currentGroupId), {
                         nextSessionTimestamp: calculateNextSessionTimestamp(currentGroupId)
                     });
@@ -430,7 +448,7 @@
                     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
                     
                     if (days > 0) {
-                        countdownEl.innerText = `${days}d ${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
+                        countdownEl.innerText = `${days}ي ${String(hours).padStart(2, '0')}س ${String(minutes).padStart(2, '0')}د ${String(seconds).padStart(2, '0')}ث`;
                     } else {
                         countdownEl.innerText = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
                     }
@@ -448,17 +466,17 @@
                         <h3 class="font-bold text-dark-purple mb-2">${student.name}</h3>
                         <div class="space-y-2">
                             <div class="flex items-center space-x-2">
-                                <label class="text-sm font-semibold text-gray-700">Paid:</label>
+                                <label class="text-sm font-semibold text-gray-700">مدفوع:</label>
                                 <input type="checkbox" data-student-id="${student.id}" data-field="paid" class="paid-checkbox" ${student.paid ? 'checked' : ''} ${currentRole === 'student' ? 'disabled' : ''}>
                             </div>
                             <div>
-                                <label class="text-sm font-semibold text-gray-700">Evaluation:</label>
+                                <label class="text-sm font-semibold text-gray-700">تقييم:</label>
                                 <textarea data-student-id="${student.id}" data-field="evaluation" class="evaluation-textarea w-full p-2 rounded-md border border-gray-300 mt-1 focus:outline-none focus:ring-2 focus:ring-golden-yellow" rows="2" ${currentRole === 'student' ? 'disabled' : ''}>${student.evaluation || ''}</textarea>
                             </div>
                         </div>
                     </div>
                     ${currentRole === 'teacher' || currentRole === 'assistant' ? `
-                        <button onclick="deleteStudent('${student.id}')" class="bg-red-500 text-white px-3 py-1 rounded-md text-sm hover:bg-red-600 transition">Delete</button>
+                        <button onclick="deleteStudent('${student.id}')" class="bg-red-500 text-white px-3 py-1 rounded-md text-sm hover:bg-red-600 transition">حذف</button>
                     ` : ''}
                 </div>
             `).join('');
@@ -478,7 +496,7 @@
             const studentNameInput = document.getElementById('new-student-name');
             const studentName = studentNameInput.value.trim();
             if (!studentName || !currentGroupId) {
-                showModal("Empty Field", "Please enter a student's name to add.");
+                showModal("حقل فارغ", "يرجى إدخال اسم الطالب للإضافة.");
                 return;
             }
             const studentsCollectionRef = collection(db, `artifacts/${appId}/public/data/groups/${currentGroupId}/students`);
@@ -488,7 +506,7 @@
                 evaluation: ''
             });
             studentNameInput.value = '';
-            showModal("Success", `Student "${studentName}" added successfully.`);
+            showModal("نجاح", `تمت إضافة الطالب "${studentName}" بنجاح.`);
         };
 
         const deleteStudent = async (studentId) => {
@@ -496,10 +514,10 @@
             const studentDocRef = doc(db, `artifacts/${appId}/public/data/groups/${currentGroupId}/students`, studentId);
             try {
                 await deleteDoc(studentDocRef);
-                showModal("Student Deleted", "The student has been successfully removed.");
+                showModal("تم حذف الطالب", "تمت إزالة الطالب بنجاح.");
             } catch (e) {
                 console.error("Error deleting student:", e);
-                showModal("Error", "Failed to delete student. Please try again.");
+                showModal("خطأ", "فشل في حذف الطالب. يرجى المحاولة مرة أخرى.");
             }
         };
 
@@ -510,7 +528,7 @@
                 console.log(`Updated student ${studentId}: ${field} to ${value}`);
             } catch (e) {
                 console.error("Error updating student data:", e);
-                showModal("Error", "Failed to save student data. Please try again.");
+                showModal("خطأ", "فشل في حفظ بيانات الطالب. يرجى المحاولة مرة أخرى.");
             }
         };
 
@@ -529,7 +547,7 @@
         const addMaterial = async () => {
             const materialText = document.getElementById('new-material-text').value;
             if (!materialText.trim() || !currentGroupId) {
-                showModal("Empty Field", "Please enter some material to add.");
+                showModal("حقل فارغ", "يرجى إدخال بعض المواد للإضافة.");
                 return;
             }
             const groupDocRef = doc(db, `artifacts/${appId}/public/data/groups`, currentGroupId);
@@ -551,7 +569,7 @@
                 await updateDoc(groupDocRef, {
                     nextSessionTimestamp: nextTimestamp
                 });
-                showModal("Session Skipped", "The next session has been successfully skipped. The countdown now points to the session after that.");
+                showModal("تم تخطي الحصة", "تم تخطي الحصة القادمة بنجاح. يشير العد التنازلي الآن إلى الحصة التي تليها.");
             }
         };
         
@@ -560,7 +578,7 @@
             const timeInput = document.getElementById('reschedule-time').value;
 
             if (!dateInput || !timeInput || !currentGroupId) {
-                showModal("Missing Information", "Please select both a date and a time.");
+                showModal("معلومات ناقصة", "يرجى تحديد التاريخ والوقت.");
                 return;
             }
             
@@ -574,12 +592,14 @@
                 nextSessionTimestamp: newTimestamp
             });
             hideRescheduleModal();
-            showModal("Session Rescheduled", `The next session has been rescheduled to ${new Date(newTimestamp).toLocaleString()}.`);
+            showModal("تم تغيير موعد الحصة", `تم تغيير موعد الحصة القادمة إلى ${new Date(newTimestamp).toLocaleString()}.`);
         };
 
         const listenForAssistantNotes = () => {
             if (!userId) return;
             const notesDocRef = doc(db, `artifacts/${appId}/users/${userId}/notes`, 'main');
+            // This listener will fail if your Firestore security rules do not allow reads and writes
+            // هذا المستمع يحتاج أيضًا إلى أذونات القراءة/الكتابة من قواعد الأمان الخاصة بك
             onSnapshot(notesDocRef, (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
@@ -595,7 +615,7 @@
             const notesText = document.getElementById('assistant-notes-text').value;
             const notesDocRef = doc(db, `artifacts/${appId}/users/${userId}/notes`, 'main');
             await setDoc(notesDocRef, { notes: notesText }, { merge: true });
-            showModal("Notes Saved", "Your notes have been saved successfully.");
+            showModal("تم حفظ الملاحظات", "تم حفظ ملاحظاتك بنجاح.");
         };
 
         const calculateNextSessionTimestamp = (groupId, previousTimestamp = null) => {
