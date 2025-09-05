@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Dashboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f7f7f7; margin: 0; padding: 0; }
+    header { background: #673AB7; color: white; padding: 15px; text-align: center; }
+    img { width: 60px; vertical-align: middle; }
+    .container { padding: 20px; }
+    .section { background: white; padding: 15px; margin: 10px 0; border-radius: 8px; box-shadow: 0 0 5px #ccc; }
+    button { background: #f44336; color: #fff; border: none; padding: 10px; margin: 5px; border-radius: 5px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="https://i.postimg.cc/285r37QM/1111111111111.jpg" alt="logo"> Student Dashboard
+  </header>
+  <div class="container">
+    <div class="section">
+      <h3>Next Lesson Countdown</h3>
+      <p id="countdown">Loading...</p>
+    </div>
+    <div class="section">
+      <h3>Homework</h3>
+      <p>No homework assigned yet.</p>
+    </div>
+    <div class="section">
+      <h3>Class Chat</h3>
+      <input type="text" id="chatMsg" placeholder="Write a message">
+      <button onclick="sendMsg()">Send</button>
+      <div id="chatBox"></div>
+    </div>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <script type="module">
+    import { logoutUser } from "./app.js";
+    window.logout = logoutUser;
+
+    // Dummy countdown
+    function startCountdown(minutes) {
+      let time = minutes * 60;
+      const countdownEl = document.getElementById("countdown");
+      setInterval(() => {
+        const m = Math.floor(time / 60);
+        const s = time % 60;
+        countdownEl.innerText = `${m}:${s < 10 ? "0" : ""}${s}`;
+        if (time > 0) time--;
+      }, 1000);
+    }
+    startCountdown(60);
+
+    // Dummy chat
+    window.sendMsg = () => {
+      const msg = document.getElementById("chatMsg").value;
+      if (msg) {
+        const box = document.getElementById("chatBox");
+        const p = document.createElement("p");
+        p.textContent = msg;
+        box.appendChild(p);
+        document.getElementById("chatMsg").value = "";
+      }
+    }
+  </script>
+</body>
+</html>
