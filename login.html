@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .login-box {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      width: 300px;
+      box-shadow: 0px 0px 10px #ccc;
+    }
+    img { width: 100px; margin-bottom: 15px; }
+    input, button {
+      width: 90%;
+      margin: 8px 0;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #aaa;
+    }
+    button {
+      background: #2196F3;
+      color: #fff;
+      cursor: pointer;
+      border: none;
+    }
+    a { display: block; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <img src="https://i.postimg.cc/285r37QM/1111111111111.jpg" alt="logo">
+    <h2>Login</h2>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <a href="signup.html">Don't have an account? Sign up</a>
+  </div>
+
+  <script type="module">
+    import { loginUser } from "./app.js";
+    window.login = () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      loginUser(email, password);
+    }
+  </script>
+</body>
+</html>
