@@ -1,59 +1,652 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Home Page</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(to right, #f8f9fa, #e9ecef);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    .container {
-      text-align: center;
-      background: white;
-      padding: 40px;
-      border-radius: 20px;
-      box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
-    }
-    img {
-      width: 120px;
-      margin-bottom: 20px;
-    }
-    h1 {
-      margin-bottom: 30px;
-      color: #333;
-    }
-    .btn {
-      display: block;
-      width: 200px;
-      margin: 10px auto;
-      padding: 12px;
-      border: none;
-      border-radius: 12px;
-      background: #007bff;
-      color: white;
-      font-size: 18px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    .btn:hover {
-      background: #0056b3;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mrs Beba Fakhry's Math Classes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FBF6E7; /* Light beige from the logo */
+            color: #4B3A4D; /* Dark purple from the logo */
+        }
+        .text-dark-purple { color: #4B3A4D; }
+        .bg-dark-purple { background-color: #4B3A4D; }
+        .bg-light-beige { background-color: #FBF6E7; }
+        .bg-golden-yellow { background-color: #D6A461; }
+        .text-golden-yellow { color: #D6A461; }
+    </style>
 </head>
-<body>
-  <div class="container">
-    <img src="https://i.postimg.cc/285r37QM/1111111111111.jpg" alt="Logo">
-    <h1>Welcome</h1>
-    <button class="btn" onclick="window.location.href='login.html'">Login</button>
-    <button class="btn" onclick="window.location.href='signup.html'">Sign Up</button>
-  </div>
+<body class="flex flex-col min-h-screen">
+    <!-- Main App Container -->
+    <div id="app-container" class="flex-grow flex items-center justify-center p-4">
+        <!-- Content will be rendered here by JavaScript -->
+    </div>
+
+    <!-- Message Modal -->
+    <div id="modal-container" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm text-center">
+            <h3 id="modal-title" class="text-xl font-bold mb-2"></h3>
+            <p id="modal-message" class="mb-4"></p>
+            <button id="modal-ok-button" class="bg-dark-purple text-white px-4 py-2 rounded-md font-semibold hover:bg-opacity-80 transition">OK</button>
+        </div>
+    </div>
+    
+    <!-- Reschedule Modal -->
+    <div id="reschedule-modal-container" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm">
+            <h3 class="text-xl font-bold text-dark-purple mb-4">Reschedule Session</h3>
+            <div class="space-y-4">
+                <div>
+                    <label for="reschedule-date" class="block text-sm font-medium text-gray-700">New Date</label>
+                    <input type="date" id="reschedule-date" class="w-full px-3 py-2 border rounded-md focus:ring-golden-yellow focus:border-golden-yellow">
+                </div>
+                <div>
+                    <label for="reschedule-time" class="block text-sm font-medium text-gray-700">New Time (PM)</label>
+                    <input type="time" id="reschedule-time" class="w-full px-3 py-2 border rounded-md focus:ring-golden-yellow focus:border-golden-yellow">
+                </div>
+            </div>
+            <div class="mt-6 flex justify-end space-x-2">
+                <button id="reschedule-cancel-button" class="px-4 py-2 bg-gray-200 text-dark-purple rounded-md font-semibold hover:bg-gray-300 transition">Cancel</button>
+                <button id="reschedule-save-button" class="px-4 py-2 bg-dark-purple text-white rounded-md font-semibold hover:bg-opacity-80 transition">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, query, addDoc, getDocs, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase global variables
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { /* fallback config */ };
+
+        // Firebase Initialization
+        let app, db, auth;
+        let userId = null;
+        let currentRole = null;
+        let currentGroupId = null;
+        let countdownInterval;
+
+        // Schedules data
+        const schedules = {
+            "Sat & Tue": [
+                { id: 'grade3_sat_tue', grade: 'Grade 3', time: '4:30 - 5:30', days: 'Sat & Tue' },
+                { id: 'grade2_sat_tue', grade: 'Grade 2', time: '5:30 - 6:30', days: 'Sat & Tue' },
+                { id: 'grade4_sat_tue', grade: 'Grade 4', time: '6:45 - 8:00', days: 'Sat & Tue' },
+                { id: 'grade6_sat_tue', grade: 'Grade 6', time: '8:00 - 9:00', days: 'Sat & Tue' }
+            ],
+            "Sun & Wed": [
+                { id: 'grade3_sun_wed', grade: 'Grade 3', time: '4:30 - 5:30', days: 'Sun & Wed' },
+                { id: 'grade4_sun_wed', grade: 'Grade 4', time: '5:30 - 6:30', days: 'Sun & Wed' },
+                { id: 'grade2_sun_wed', grade: 'Grade 2', time: '6:30 - 7:30', days: 'Sun & Wed' },
+                { id: 'grade5_sun_wed', grade: 'Grade 5', time: '7:30 - 8:30', days: 'Sun & Wed' },
+                { id: 'grade6_sun_wed', grade: 'Grade 6', time: '8:30 - 9:30', days: 'Sun & Wed' }
+            ],
+            "Mon & Thu": [
+                { id: 'grade5_mon_thu', grade: 'Grade 5', time: '5:30 - 6:30', days: 'Mon & Thu' },
+                { id: 'grade4_mon_thu', grade: 'Grade 4', time: '7:00 - 8:00', days: 'Mon & Thu' },
+                { id: 'grade6_mon_thu', grade: 'Grade 6', time: '8:15 - 9:15', days: 'Mon & Thu' }
+            ]
+        };
+
+        // --- UI Rendering Functions ---
+
+        const showModal = (title, message) => {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-message').innerText = message;
+            document.getElementById('modal-container').classList.remove('hidden');
+        };
+
+        const hideModal = () => {
+            document.getElementById('modal-container').classList.add('hidden');
+        };
+        
+        const showRescheduleModal = () => {
+            document.getElementById('reschedule-modal-container').classList.remove('hidden');
+        };
+        
+        const hideRescheduleModal = () => {
+            document.getElementById('reschedule-modal-container').classList.add('hidden');
+        };
+
+        const renderLogin = () => {
+            const container = document.getElementById('app-container');
+            container.innerHTML = `
+                <div class="bg-white p-8 sm:p-12 rounded-2xl shadow-xl w-full max-w-sm text-center">
+                    <img src="https://i.postimg.cc/285r37QM/1111111111111.jpg" alt="Logo" class="mx-auto w-48 mb-8 rounded-full">
+                    <h1 class="text-3xl font-bold mb-6 text-dark-purple">Welcome</h1>
+                    <div class="space-y-4">
+                        <input id="password-input" type="password" placeholder="Enter Password" class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:outline-none focus:ring-2 focus:ring-golden-yellow">
+                        <button id="login-button" class="w-full bg-dark-purple text-white py-3 rounded-lg font-semibold hover:bg-opacity-80 transition">Login</button>
+                    </div>
+                </div>
+            `;
+            document.getElementById('login-button').addEventListener('click', handleLogin);
+        };
+
+        const renderStudentHome = () => {
+            currentRole = 'student';
+            const container = document.getElementById('app-container');
+            container.innerHTML = `
+                <div class="w-full max-w-2xl p-6 sm:p-8 bg-white rounded-2xl shadow-xl">
+                    <div class="flex items-center justify-between mb-8">
+                        <h1 class="text-2xl sm:text-3xl font-bold text-dark-purple">Student Dashboard</h1>
+                        <button onclick="renderLogin()" class="px-4 py-2 bg-gray-200 text-dark-purple rounded-lg font-semibold hover:bg-gray-300 transition">Logout</button>
+                    </div>
+                    <div class="space-y-6">
+                        ${Object.keys(schedules).map(day => `
+                            <div>
+                                <h2 class="text-xl font-bold text-golden-yellow mb-4">${day}</h2>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    ${schedules[day].map(group => `
+                                        <button onclick="viewGroup('${group.id}')" class="bg-light-beige p-6 rounded-lg shadow-md hover:shadow-lg transition transform hover:scale-105">
+                                            <h3 class="text-lg font-bold text-dark-purple">${group.grade}</h3>
+                                            <p class="text-sm font-semibold text-gray-600">${group.days}</p>
+                                            <p class="text-sm text-gray-500">${group.time} PM</p>
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        };
+
+        const renderTeacherHome = () => {
+            currentRole = 'teacher';
+            const container = document.getElementById('app-container');
+            container.innerHTML = `
+                <div class="w-full max-w-2xl p-6 sm:p-8 bg-white rounded-2xl shadow-xl">
+                    <div class="flex items-center justify-between mb-8">
+                        <h1 class="text-2xl sm:text-3xl font-bold text-dark-purple">Teacher Dashboard</h1>
+                        <button onclick="renderLogin()" class="px-4 py-2 bg-gray-200 text-dark-purple rounded-lg font-semibold hover:bg-gray-300 transition">Logout</button>
+                    </div>
+                    <div class="space-y-6">
+                        ${Object.keys(schedules).map(day => `
+                            <div>
+                                <h2 class="text-xl font-bold text-golden-yellow mb-4">${day}</h2>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    ${schedules[day].map(group => `
+                                        <button onclick="viewGroup('${group.id}')" class="bg-light-beige p-6 rounded-lg shadow-md hover:shadow-lg transition transform hover:scale-105">
+                                            <h3 class="text-lg font-bold text-dark-purple">${group.grade}</h3>
+                                            <p class="text-sm font-semibold text-gray-600">${group.days}</p>
+                                            <p class="text-sm text-gray-500">${group.time} PM</p>
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        };
+        
+        const renderAssistantHome = () => {
+            currentRole = 'assistant';
+            const container = document.getElementById('app-container');
+            container.innerHTML = `
+                <div class="w-full max-w-2xl p-6 sm:p-8 bg-white rounded-2xl shadow-xl">
+                    <div class="flex items-center justify-between mb-8">
+                        <h1 class="text-2xl sm:text-3xl font-bold text-dark-purple">Assistant Dashboard</h1>
+                        <button onclick="renderLogin()" class="px-4 py-2 bg-gray-200 text-dark-purple rounded-lg font-semibold hover:bg-gray-300 transition">Logout</button>
+                    </div>
+                    <p class="mb-4 text-sm text-gray-500">Your User ID: ${userId}</p>
+                    <div class="space-y-6">
+                        ${Object.keys(schedules).map(day => `
+                            <div>
+                                <h2 class="text-xl font-bold text-golden-yellow mb-4">${day}</h2>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    ${schedules[day].map(group => `
+                                        <button onclick="viewGroup('${group.id}')" class="bg-light-beige p-6 rounded-lg shadow-md hover:shadow-lg transition transform hover:scale-105">
+                                            <h3 class="text-lg font-bold text-dark-purple">${group.grade}</h3>
+                                            <p class="text-sm font-semibold text-gray-600">${group.days}</p>
+                                            <p class="text-sm text-gray-500">${group.time} PM</p>
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        };
+
+        const renderGroupPage = async (groupId) => {
+            currentGroupId = groupId;
+            const groupData = Object.values(schedules).flat().find(g => g.id === groupId);
+            const container = document.getElementById('app-container');
+            container.innerHTML = `
+                <div class="w-full max-w-3xl p-6 sm:p-8 bg-white rounded-2xl shadow-xl">
+                    <div class="flex items-center justify-between mb-8">
+                        <button onclick="goBack()" class="px-4 py-2 bg-gray-200 text-dark-purple rounded-lg font-semibold hover:bg-gray-300 transition">Back</button>
+                        <h1 class="text-2xl sm:text-3xl font-bold text-dark-purple">${groupData.grade} - ${groupData.days}</h1>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+                        <div class="bg-light-beige p-6 rounded-lg shadow-md text-center">
+                            <h2 class="text-lg font-bold text-dark-purple mb-2">Next Session Countdown</h2>
+                            <p id="countdown" class="text-4xl font-mono text-golden-yellow">--:--:--</p>
+                        </div>
+                        <div class="bg-light-beige p-6 rounded-lg shadow-md text-center">
+                            <h2 class="text-lg font-bold text-dark-purple mb-2">Lesson Number</h2>
+                            <div class="flex items-center justify-center space-x-4">
+                                ${currentRole === 'teacher' ? `
+                                    <button id="decrement-lesson" class="bg-dark-purple text-white px-3 py-1 rounded-md">-</button>
+                                ` : ''}
+                                <p id="lesson-number" class="text-4xl font-mono text-golden-yellow">--</p>
+                                ${currentRole === 'teacher' ? `
+                                    <button id="increment-lesson" class="bg-dark-purple text-white px-3 py-1 rounded-md">+</button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    ${currentRole === 'teacher' ? `
+                        <div class="flex justify-center space-x-4 mb-6">
+                            <button id="reschedule-session" class="bg-dark-purple text-white py-2 px-4 rounded-lg font-semibold hover:bg-opacity-80 transition">Reschedule Session</button>
+                            <button id="skip-next-session" class="bg-red-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-700 transition">Skip Next Session</button>
+                        </div>
+                    ` : ''}
+
+                    <div id="notes-section" class="bg-light-beige p-6 rounded-lg shadow-md mb-8">
+                        <h2 class="text-lg font-bold text-dark-purple mb-4">Class Materials</h2>
+                        <div id="materials-container" class="space-y-4"></div>
+                        ${currentRole === 'teacher' ? `
+                            <div class="mt-6 border-t pt-4">
+                                <h3 class="font-semibold mb-2">Add New Material</h3>
+                                <textarea id="new-material-text" placeholder="Enter text, links, or homework details..." rows="3" class="w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-golden-yellow"></textarea>
+                                <button id="add-material-button" class="mt-2 bg-dark-purple text-white px-4 py-2 rounded-lg font-semibold hover:bg-opacity-80 transition">Add Material</button>
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <!-- Students Roster & Evaluation Section -->
+                    <div id="students-section" class="bg-light-beige p-6 rounded-lg shadow-md mb-8">
+                        <h2 class="text-lg font-bold text-dark-purple mb-4">Student Roster and Evaluations</h2>
+                        <div id="students-list-container" class="space-y-4"></div>
+                        ${currentRole === 'teacher' || currentRole === 'assistant' ? `
+                            <div class="mt-6 border-t pt-4">
+                                <h3 class="font-semibold mb-2">Add New Student</h3>
+                                <div class="flex space-x-2">
+                                    <input id="new-student-name" type="text" placeholder="Student Name" class="w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-golden-yellow">
+                                    <button id="add-student-button" class="bg-dark-purple text-white px-4 py-2 rounded-lg font-semibold hover:bg-opacity-80 transition">Add Student</button>
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    ${currentRole === 'assistant' ? `
+                        <div id="assistant-notes-section" class="bg-golden-yellow bg-opacity-20 p-6 rounded-lg shadow-md">
+                            <h2 class="text-lg font-bold text-dark-purple mb-4">Assistant Notes (Private)</h2>
+                            <textarea id="assistant-notes-text" placeholder="Add notes about payments or other details..." rows="5" class="w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-golden-yellow"></textarea>
+                            <button id="save-assistant-notes" class="mt-2 bg-dark-purple text-white px-4 py-2 rounded-lg font-semibold hover:bg-opacity-80 transition">Save Notes</button>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            // Add listeners
+            if (currentRole === 'teacher') {
+                document.getElementById('increment-lesson').addEventListener('click', () => updateLessonCounter(1));
+                document.getElementById('decrement-lesson').addEventListener('click', () => updateLessonCounter(-1));
+                document.getElementById('add-material-button').addEventListener('click', addMaterial);
+                document.getElementById('skip-next-session').addEventListener('click', skipNextSession);
+                document.getElementById('reschedule-session').addEventListener('click', showRescheduleModal);
+                document.getElementById('reschedule-cancel-button').addEventListener('click', hideRescheduleModal);
+                document.getElementById('reschedule-save-button').addEventListener('click', rescheduleNextSession);
+            }
+            if (currentRole === 'teacher' || currentRole === 'assistant') {
+                document.getElementById('add-student-button').addEventListener('click', addStudent);
+            }
+            if (currentRole === 'assistant') {
+                document.getElementById('save-assistant-notes').addEventListener('click', saveAssistantNotes);
+            }
+
+            // Start real-time listeners
+            listenForGroupData(groupId);
+            if (currentRole === 'assistant') {
+                listenForAssistantNotes();
+            }
+        };
+
+        const goBack = () => {
+            if (currentRole === 'student') renderStudentHome();
+            else if (currentRole === 'teacher') renderTeacherHome();
+            else if (currentRole === 'assistant') renderAssistantHome();
+            clearInterval(countdownInterval);
+        };
+
+        const initializeFirebase = async () => {
+            try {
+                if (!app) {
+                    app = initializeApp(firebaseConfig);
+                    db = getFirestore(app);
+                    auth = getAuth(app);
+
+                    // Sign in anonymously or with custom token
+                    if (typeof __initial_auth_token !== 'undefined') {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+
+                    onAuthStateChanged(auth, (user) => {
+                        if (user) {
+                            userId = user.uid;
+                        }
+                    });
+                }
+            } catch (e) {
+                console.error("Error initializing Firebase:", e);
+                showModal("Error", "Failed to initialize the app. Please check the console for details.");
+            }
+        };
+
+        const handleLogin = async () => {
+            const password = document.getElementById('password-input').value;
+            switch (password) {
+                case '00192':
+                    renderStudentHome();
+                    break;
+                case '121212':
+                    renderTeacherHome();
+                    break;
+                case '912912':
+                    renderAssistantHome();
+                    break;
+                default:
+                    showModal("Invalid Password", "The password you entered is incorrect. Please try again.");
+                    break;
+            }
+        };
+
+        const listenForGroupData = (groupId) => {
+            const groupDocRef = doc(db, `artifacts/${appId}/public/data/groups`, groupId);
+            onSnapshot(groupDocRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    updateGroupPageUI(data);
+                } else {
+                    // Initialize if the document doesn't exist
+                    setDoc(groupDocRef, {
+                        lessonNumber: 1,
+                        nextSessionTimestamp: calculateNextSessionTimestamp(groupId),
+                        materials: []
+                    });
+                }
+            }, (error) => {
+                console.error("Error listening to group data:", error);
+                showModal("Error", "Could not load class data. Please try refreshing.");
+            });
+
+            // Listen for students data in a sub-collection
+            const studentsCollectionRef = collection(db, `artifacts/${appId}/public/data/groups/${groupId}/students`);
+            onSnapshot(studentsCollectionRef, async (querySnapshot) => {
+                const students = [];
+                querySnapshot.forEach(doc => {
+                    students.push({ id: doc.id, ...doc.data() });
+                });
+                updateStudentsUI(students);
+            }, (error) => {
+                console.error("Error listening to students data:", error);
+            });
+        };
+
+        const updateGroupPageUI = (data) => {
+            const countdownEl = document.getElementById('countdown');
+            const lessonEl = document.getElementById('lesson-number');
+            const materialsContainer = document.getElementById('materials-container');
+
+            if (lessonEl) lessonEl.innerText = data.lessonNumber || '--';
+            if (materialsContainer) {
+                materialsContainer.innerHTML = (data.materials || []).map(mat => `
+                    <div class="bg-white p-4 rounded-md shadow-inner text-gray-700 whitespace-pre-wrap">${mat.content}</div>
+                `).join('');
+            }
+
+            // Countdown timer
+            clearInterval(countdownInterval);
+            countdownInterval = setInterval(() => {
+                const now = new Date().getTime();
+                const distance = data.nextSessionTimestamp - now;
+                
+                if (distance < 0) {
+                    // If countdown is expired, display a message and trigger a refresh of the timestamp in Firestore.
+                    countdownEl.innerText = "Session Expired";
+                    updateDoc(doc(db, `artifacts/${appId}/public/data/groups`, currentGroupId), {
+                        nextSessionTimestamp: calculateNextSessionTimestamp(currentGroupId)
+                    });
+                    clearInterval(countdownInterval);
+                } else {
+                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                    
+                    if (days > 0) {
+                        countdownEl.innerText = `${days}d ${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
+                    } else {
+                        countdownEl.innerText = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                    }
+                }
+            }, 1000);
+        };
+        
+        const updateStudentsUI = (students) => {
+            const studentsListContainer = document.getElementById('students-list-container');
+            if (!studentsListContainer) return;
+            
+            studentsListContainer.innerHTML = students.map(student => `
+                <div class="bg-white p-4 rounded-md shadow-inner flex justify-between items-center">
+                    <div>
+                        <h3 class="font-bold text-dark-purple mb-2">${student.name}</h3>
+                        <div class="space-y-2">
+                            <div class="flex items-center space-x-2">
+                                <label class="text-sm font-semibold text-gray-700">Paid:</label>
+                                <input type="checkbox" data-student-id="${student.id}" data-field="paid" class="paid-checkbox" ${student.paid ? 'checked' : ''} ${currentRole === 'student' ? 'disabled' : ''}>
+                            </div>
+                            <div>
+                                <label class="text-sm font-semibold text-gray-700">Evaluation:</label>
+                                <textarea data-student-id="${student.id}" data-field="evaluation" class="evaluation-textarea w-full p-2 rounded-md border border-gray-300 mt-1 focus:outline-none focus:ring-2 focus:ring-golden-yellow" rows="2" ${currentRole === 'student' ? 'disabled' : ''}>${student.evaluation || ''}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    ${currentRole === 'teacher' || currentRole === 'assistant' ? `
+                        <button onclick="deleteStudent('${student.id}')" class="bg-red-500 text-white px-3 py-1 rounded-md text-sm hover:bg-red-600 transition">Delete</button>
+                    ` : ''}
+                </div>
+            `).join('');
+
+            // Add event listeners for teachers and assistants
+            if (currentRole === 'teacher' || currentRole === 'assistant') {
+                document.querySelectorAll('.paid-checkbox').forEach(checkbox => {
+                    checkbox.addEventListener('change', (e) => handleStudentUpdate(e.target.dataset.studentId, 'paid', e.target.checked));
+                });
+                document.querySelectorAll('.evaluation-textarea').forEach(textarea => {
+                    textarea.addEventListener('change', (e) => handleStudentUpdate(e.target.dataset.studentId, 'evaluation', e.target.value));
+                });
+            }
+        };
+
+        const addStudent = async () => {
+            const studentNameInput = document.getElementById('new-student-name');
+            const studentName = studentNameInput.value.trim();
+            if (!studentName || !currentGroupId) {
+                showModal("Empty Field", "Please enter a student's name to add.");
+                return;
+            }
+            const studentsCollectionRef = collection(db, `artifacts/${appId}/public/data/groups/${currentGroupId}/students`);
+            await addDoc(studentsCollectionRef, {
+                name: studentName,
+                paid: false,
+                evaluation: ''
+            });
+            studentNameInput.value = '';
+            showModal("Success", `Student "${studentName}" added successfully.`);
+        };
+
+        const deleteStudent = async (studentId) => {
+            if (!currentGroupId) return;
+            const studentDocRef = doc(db, `artifacts/${appId}/public/data/groups/${currentGroupId}/students`, studentId);
+            try {
+                await deleteDoc(studentDocRef);
+                showModal("Student Deleted", "The student has been successfully removed.");
+            } catch (e) {
+                console.error("Error deleting student:", e);
+                showModal("Error", "Failed to delete student. Please try again.");
+            }
+        };
+
+        const handleStudentUpdate = async (studentId, field, value) => {
+            const studentDocRef = doc(db, `artifacts/${appId}/public/data/groups/${currentGroupId}/students`, studentId);
+            try {
+                await updateDoc(studentDocRef, { [field]: value });
+                console.log(`Updated student ${studentId}: ${field} to ${value}`);
+            } catch (e) {
+                console.error("Error updating student data:", e);
+                showModal("Error", "Failed to save student data. Please try again.");
+            }
+        };
+
+        const updateLessonCounter = async (change) => {
+            if (!currentGroupId) return;
+            const groupDocRef = doc(db, `artifacts/${appId}/public/data/groups`, currentGroupId);
+            const docSnap = await getDoc(groupDocRef);
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                let newLessonNumber = (data.lessonNumber || 0) + change;
+                if (newLessonNumber < 1) newLessonNumber = 1;
+                await updateDoc(groupDocRef, { lessonNumber: newLessonNumber });
+            }
+        };
+
+        const addMaterial = async () => {
+            const materialText = document.getElementById('new-material-text').value;
+            if (!materialText.trim() || !currentGroupId) {
+                showModal("Empty Field", "Please enter some material to add.");
+                return;
+            }
+            const groupDocRef = doc(db, `artifacts/${appId}/public/data/groups`, currentGroupId);
+            const docSnap = await getDoc(groupDocRef);
+            const materials = docSnap.exists() ? docSnap.data().materials || [] : [];
+            materials.push({ content: materialText, timestamp: new Date().getTime() });
+            await updateDoc(groupDocRef, { materials: materials });
+            document.getElementById('new-material-text').value = '';
+        };
+
+        const skipNextSession = async () => {
+            if (!currentGroupId) return;
+            const groupDocRef = doc(db, `artifacts/${appId}/public/data/groups`, currentGroupId);
+            const docSnap = await getDoc(groupDocRef);
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                const currentTimestamp = data.nextSessionTimestamp;
+                const nextTimestamp = calculateNextSessionTimestamp(currentGroupId, currentTimestamp);
+                await updateDoc(groupDocRef, {
+                    nextSessionTimestamp: nextTimestamp
+                });
+                showModal("Session Skipped", "The next session has been successfully skipped. The countdown now points to the session after that.");
+            }
+        };
+        
+        const rescheduleNextSession = async () => {
+            const dateInput = document.getElementById('reschedule-date').value;
+            const timeInput = document.getElementById('reschedule-time').value;
+
+            if (!dateInput || !timeInput || !currentGroupId) {
+                showModal("Missing Information", "Please select both a date and a time.");
+                return;
+            }
+            
+            const [year, month, day] = dateInput.split('-').map(Number);
+            const [hour, minute] = timeInput.split(':').map(Number);
+            
+            const newTimestamp = new Date(year, month - 1, day, hour, minute, 0, 0).getTime();
+            
+            const groupDocRef = doc(db, `artifacts/${appId}/public/data/groups`, currentGroupId);
+            await updateDoc(groupDocRef, {
+                nextSessionTimestamp: newTimestamp
+            });
+            hideRescheduleModal();
+            showModal("Session Rescheduled", `The next session has been rescheduled to ${new Date(newTimestamp).toLocaleString()}.`);
+        };
+
+        const listenForAssistantNotes = () => {
+            if (!userId) return;
+            const notesDocRef = doc(db, `artifacts/${appId}/users/${userId}/notes`, 'main');
+            onSnapshot(notesDocRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    document.getElementById('assistant-notes-text').value = data.notes || '';
+                }
+            }, (error) => {
+                console.error("Error listening to assistant notes:", error);
+            });
+        };
+
+        const saveAssistantNotes = async () => {
+            if (!userId) return;
+            const notesText = document.getElementById('assistant-notes-text').value;
+            const notesDocRef = doc(db, `artifacts/${appId}/users/${userId}/notes`, 'main');
+            await setDoc(notesDocRef, { notes: notesText }, { merge: true });
+            showModal("Notes Saved", "Your notes have been saved successfully.");
+        };
+
+        const calculateNextSessionTimestamp = (groupId, previousTimestamp = null) => {
+            const groupData = Object.values(schedules).flat().find(g => g.id === groupId);
+            const [startHour, startMinute] = groupData.time.split(' - ')[0].split(':').map(Number);
+            const daysMap = {
+                'Sat': 6, 'Sun': 0, 'Mon': 1, 'Tue': 2, 'Wed': 3, 'Thu': 4, 'Fri': 5
+            };
+            const [day1, day2] = groupData.days.split(' & ');
+            const day1Index = daysMap[day1];
+            const day2Index = daysMap[day2];
+            
+            const now = previousTimestamp ? new Date(previousTimestamp) : new Date();
+            
+            let nextSession = new Date(now);
+            
+            // This function finds the next occurrence of a specific day of the week, starting from a given date.
+            const findNextDayOfWeek = (startDate, dayIndex) => {
+                const resultDate = new Date(startDate);
+                resultDate.setHours(startHour + 12, startMinute, 0, 0);
+                
+                let dayDifference = (dayIndex + 7 - resultDate.getDay()) % 7;
+                if (dayDifference === 0) { // If it's today, check the time
+                    if (resultDate.getTime() <= startDate.getTime()) {
+                        dayDifference = 7;
+                    }
+                }
+                resultDate.setDate(resultDate.getDate() + dayDifference);
+                return resultDate;
+            };
+
+            const nextDay1 = findNextDayOfWeek(nextSession, day1Index);
+            const nextDay2 = findNextDayOfWeek(nextSession, day2Index);
+            
+            const finalNextSession = nextDay1.getTime() < nextDay2.getTime() ? nextDay1 : nextDay2;
+
+            return finalNextSession.getTime();
+        };
+
+        // Initialize on window load
+        window.onload = async () => {
+            await initializeFirebase();
+            renderLogin();
+            document.getElementById('modal-ok-button').addEventListener('click', hideModal);
+        };
+        
+        // Make functions globally accessible for inline HTML calls after they are defined.
+        window.renderLogin = renderLogin;
+        window.viewGroup = renderGroupPage;
+        window.goBack = goBack;
+        window.deleteStudent = deleteStudent;
+    </script>
 </body>
 </html>
