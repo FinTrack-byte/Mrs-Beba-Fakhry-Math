@@ -9,7 +9,7 @@ header{background:linear-gradient(90deg,var(--p1),var(--p2));color:white;padding
 input,select,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid #eee;margin-top:8px}
 button{background:linear-gradient(90deg,var(--p1),var(--p2));color:white;padding:10px 14px;border-radius:12px;border:0;cursor:pointer;margin-top:10px}
 .small{font-size:13px;color:var(--muted)}
-.row{display:flex;gap:12px;flex-wrap:wrap}
+.row{display:flex;gap:12px;flex-wrap:wrap} 
 .col{flex:1;min-width:220px}
 .countdown{font-size:28px;padding:10px;border-radius:10px;background:#fafafa;text-align:center}
 .chat-box{height:220px;overflow:auto;border-radius:10px;padding:8px;border:1px solid #eee;background:#fafafa}
