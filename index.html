@@ -54,6 +54,18 @@
             </div>
         </div>
     </div>
+    
+    <!-- Edit Material Modal -->
+    <div id="edit-material-modal-container" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm">
+            <h3 class="text-xl font-bold text-dark-purple mb-4">Edit Material</h3>
+            <textarea id="edit-material-text" rows="5" class="w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-golden-yellow"></textarea>
+            <div class="mt-6 flex justify-end space-x-2">
+                <button id="edit-material-cancel-button" class="px-4 py-2 bg-gray-200 text-dark-purple rounded-md font-semibold hover:bg-gray-300 transition">Cancel</button>
+                <button id="edit-material-save-button" class="px-4 py-2 bg-dark-purple text-white rounded-md font-semibold hover:bg-opacity-80 transition">Save</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Firebase Scripts -->
     <script type="module">
@@ -61,9 +73,18 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, query, addDoc, getDocs, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase global variables
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { /* fallback config */ };
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyDdLJq7F6r6O9XZTQTIpwdrLR0ZySLGQrY",
+          authDomain: "shkl-1db60.firebaseapp.com",
+          databaseURL: "https://shkl-1db60-default-rtdb.firebaseio.com",
+          projectId: "shkl-1db60",
+          storageBucket: "shkl-1db60.firebasestorage.app",
+          messagingSenderId: "83946018492",
+          appId: "1:83946018492:web:3cfa51fa2ddebee27de2b9",
+          measurementId: "G-PW83MCMQYK"
+        };
+        const appId = firebaseConfig.appId.split(':')[2];
 
         // Firebase Initialization
         let app, db, auth;
@@ -71,6 +92,7 @@
         let currentRole = null;
         let currentGroupId = null;
         let countdownInterval;
+        let materialToEditIndex = null;
 
         // Schedules data
         const schedules = {
@@ -112,6 +134,16 @@
         
         const hideRescheduleModal = () => {
             document.getElementById('reschedule-modal-container').classList.add('hidden');
+        };
+
+        const showEditMaterialModal = (index, value) => {
+            materialToEditIndex = index;
+            document.getElementById('edit-material-text').value = value;
+            document.getElementById('edit-material-modal-container').classList.remove('hidden');
+        };
+
+        const hideEditMaterialModal = () => {
+            document.getElementById('edit-material-modal-container').classList.add('hidden');
         };
 
         const renderLogin = () => {
@@ -257,10 +289,18 @@
                     <div id="notes-section" class="bg-light-beige p-6 rounded-lg shadow-md mb-8">
                         <h2 class="text-lg font-bold text-dark-purple mb-4">مواد الحصة</h2>
                         <div id="materials-container" class="space-y-4"></div>
-                        ${currentRole === 'teacher' ? `
+                        ${currentRole === 'teacher' || currentRole === 'assistant' ? `
                             <div class="mt-6 border-t pt-4">
                                 <h3 class="font-semibold mb-2">إضافة مادة جديدة</h3>
-                                <textarea id="new-material-text" placeholder="أدخل نصوص، روابط، أو تفاصيل الواجبات..." rows="3" class="w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-golden-yellow"></textarea>
+                                <div class="flex items-center space-x-4 mb-2">
+                                    <label for="material-type" class="text-sm font-medium">نوع المادة:</label>
+                                    <select id="material-type" class="rounded-md border p-1">
+                                        <option value="text">نص</option>
+                                        <option value="image">صورة</option>
+                                        <option value="video">فيديو (Terabox)</option>
+                                    </select>
+                                </div>
+                                <textarea id="new-material-text" placeholder="أدخل نص، رابط صورة، أو رابط فيديو..." rows="3" class="w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-golden-yellow"></textarea>
                                 <button id="add-material-button" class="mt-2 bg-dark-purple text-white px-4 py-2 rounded-lg font-semibold hover:bg-opacity-80 transition">إضافة مادة</button>
                             </div>
                         ` : ''}
@@ -292,17 +332,32 @@
             `;
             
             // Add listeners
+            if (currentRole === 'teacher' || currentRole === 'assistant') {
+                document.getElementById('add-material-button').addEventListener('click', addMaterial);
+                document.getElementById('material-type').addEventListener('change', (e) => {
+                    const textarea = document.getElementById('new-material-text');
+                    if (e.target.value === 'text') {
+                        textarea.placeholder = "أدخل نص، روابط، أو تفاصيل الواجبات...";
+                        textarea.rows = 3;
+                    } else if (e.target.value === 'image') {
+                        textarea.placeholder = "أدخل رابط الصورة...";
+                        textarea.rows = 1;
+                    } else {
+                        textarea.placeholder = "أدخل رابط فيديو Terabox...";
+                        textarea.rows = 1;
+                    }
+                });
+                document.getElementById('add-student-button').addEventListener('click', addStudent);
+            }
             if (currentRole === 'teacher') {
                 document.getElementById('increment-lesson').addEventListener('click', () => updateLessonCounter(1));
                 document.getElementById('decrement-lesson').addEventListener('click', () => updateLessonCounter(-1));
-                document.getElementById('add-material-button').addEventListener('click', addMaterial);
                 document.getElementById('skip-next-session').addEventListener('click', skipNextSession);
                 document.getElementById('reschedule-session').addEventListener('click', showRescheduleModal);
                 document.getElementById('reschedule-cancel-button').addEventListener('click', hideRescheduleModal);
                 document.getElementById('reschedule-save-button').addEventListener('click', rescheduleNextSession);
-            }
-            if (currentRole === 'teacher' || currentRole === 'assistant') {
-                document.getElementById('add-student-button').addEventListener('click', addStudent);
+                document.getElementById('edit-material-cancel-button').addEventListener('click', hideEditMaterialModal);
+                document.getElementById('edit-material-save-button').addEventListener('click', saveEditedMaterial);
             }
             if (currentRole === 'assistant') {
                 document.getElementById('save-assistant-notes').addEventListener('click', saveAssistantNotes);
@@ -423,9 +478,34 @@
 
             if (lessonEl) lessonEl.innerText = data.lessonNumber || '--';
             if (materialsContainer) {
-                materialsContainer.innerHTML = (data.materials || []).map(mat => `
-                    <div class="bg-white p-4 rounded-md shadow-inner text-gray-700 whitespace-pre-wrap">${mat.content}</div>
-                `).join('');
+                materialsContainer.innerHTML = (data.materials || []).map((mat, index) => {
+                    let contentHTML = '';
+                    if (mat.type === 'image') {
+                        contentHTML = `<img src="${mat.value}" alt="Lesson Material" class="w-full h-auto rounded-md object-cover">`;
+                    } else if (mat.type === 'video') {
+                        // Terabox links are not embeddable, so we provide a clickable link
+                        contentHTML = `<a href="${mat.value}" target="_blank" class="text-blue-600 underline hover:no-underline">مشاهدة الفيديو على Terabox</a>`;
+                    } else {
+                        // Default to text
+                        contentHTML = `<p class="whitespace-pre-wrap">${mat.value}</p>`;
+                    }
+
+                    const controls = currentRole === 'teacher' || currentRole === 'assistant' ? `
+                        <div class="flex space-x-2 mt-2">
+                            <button onclick="editMaterial(${index})" class="text-xs text-blue-600 hover:text-blue-800 transition">تعديل</button>
+                            <button onclick="deleteMaterial(${index})" class="text-xs text-red-600 hover:text-red-800 transition">حذف</button>
+                        </div>
+                    ` : '';
+
+                    return `
+                        <div class="bg-white p-4 rounded-md shadow-inner">
+                            <div>
+                                ${contentHTML}
+                            </div>
+                            ${controls}
+                        </div>
+                    `;
+                }).join('');
             }
 
             // Countdown timer
@@ -545,17 +625,57 @@
         };
 
         const addMaterial = async () => {
-            const materialText = document.getElementById('new-material-text').value;
-            if (!materialText.trim() || !currentGroupId) {
+            const materialType = document.getElementById('material-type').value;
+            const materialValue = document.getElementById('new-material-text').value;
+
+            if (!materialValue.trim() || !currentGroupId) {
                 showModal("حقل فارغ", "يرجى إدخال بعض المواد للإضافة.");
                 return;
             }
+
             const groupDocRef = doc(db, `artifacts/${appId}/public/data/groups`, currentGroupId);
             const docSnap = await getDoc(groupDocRef);
             const materials = docSnap.exists() ? docSnap.data().materials || [] : [];
-            materials.push({ content: materialText, timestamp: new Date().getTime() });
+            materials.push({ type: materialType, value: materialValue, timestamp: new Date().getTime() });
             await updateDoc(groupDocRef, { materials: materials });
             document.getElementById('new-material-text').value = '';
+        };
+
+        const deleteMaterial = async (index) => {
+            if (!currentGroupId) return;
+            const groupDocRef = doc(db, `artifacts/${appId}/public/data/groups`, currentGroupId);
+            const docSnap = await getDoc(groupDocRef);
+            if (docSnap.exists()) {
+                const materials = docSnap.data().materials || [];
+                materials.splice(index, 1);
+                await updateDoc(groupDocRef, { materials: materials });
+            }
+        };
+        
+        const editMaterial = (index) => {
+            const groupDocRef = doc(db, `artifacts/${appId}/public/data/groups`, currentGroupId);
+            getDoc(groupDocRef).then(docSnap => {
+                if (docSnap.exists()) {
+                    const materials = docSnap.data().materials || [];
+                    showEditMaterialModal(index, materials[index].value);
+                }
+            });
+        };
+
+        const saveEditedMaterial = async () => {
+            if (materialToEditIndex === null || !currentGroupId) return;
+            const newValue = document.getElementById('edit-material-text').value;
+            const groupDocRef = doc(db, `artifacts/${appId}/public/data/groups`, currentGroupId);
+            const docSnap = await getDoc(groupDocRef);
+            if (docSnap.exists()) {
+                const materials = docSnap.data().materials || [];
+                if (materials[materialToEditIndex]) {
+                    materials[materialToEditIndex].value = newValue;
+                    await updateDoc(groupDocRef, { materials: materials });
+                    showModal("نجاح", "تم تحديث المادة بنجاح.");
+                    hideEditMaterialModal();
+                }
+            }
         };
 
         const skipNextSession = async () => {
@@ -667,6 +787,8 @@
         window.viewGroup = renderGroupPage;
         window.goBack = goBack;
         window.deleteStudent = deleteStudent;
+        window.deleteMaterial = deleteMaterial;
+        window.editMaterial = editMaterial;
     </script>
 </body>
 </html>
