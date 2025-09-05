@@ -6,7 +6,7 @@ loginForm.addEventListener('submit', async (e)=>{
   const group = document.getElementById('group').value;
   try{
     const userCred = await auth.signInWithEmailAndPassword(email,password);
-    const uid = userCred.user.uid;
+    const uid = userCred.user.uid; 
     // check role from users collection
     const doc = await db.collection('users').doc(uid).get();
     if(!doc.exists){
