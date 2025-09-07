@@ -397,8 +397,34 @@
         };
 
         // Your web app's Firebase configuration
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const appId = __app_id;
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyDdLJq7F6r6O9XZTQTIpwdrLR0ZySLGQrY",
+  authDomain: "shkl-1db60.firebaseapp.com",
+  databaseURL: "https://shkl-1db60-default-rtdb.firebaseio.com",
+  projectId: "shkl-1db60",
+  storageBucket: "shkl-1db60.firebasestorage.app",
+  messagingSenderId: "83946018492",
+  appId: "1:83946018492:web:3cfa51fa2ddebee27de2b9",
+  measurementId: "G-PW83MCMQYK"
+};
+
+const appId = firebaseConfig.projectId;
+
+// Firebase Initialization
+let app, db, auth;
+let userId = null;
+let currentRole = null;
+let currentGroupId = null;
+let countdownInterval;
+let materialToEditId = null;
+let examTimerInterval;
+let currentExamId = null;
+let examQuestions = [];
+
+
+const appId = firebaseConfig.projectId;
+
 
         // Firebase Initialization
         let app, db, auth;
